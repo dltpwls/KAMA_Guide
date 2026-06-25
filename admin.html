@@ -11,88 +11,75 @@
     --text: #e8e8ec; --text2: #9898a8; --text3: #606070;
     --accent: #7c6af7; --accent2: #a594f9;
     --danger: #cf4f4f; --success: #4fcf7a;
+    --pinned-text: #f0a040;
     --radius: 10px; --radius-sm: 6px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif; min-height: 100vh; }
 
-  header {
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px; height: 56px;
-    display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0;
-    background: rgba(15,15,17,0.95); backdrop-filter: blur(12px); z-index: 10;
-  }
+  /* ── 비밀번호 화면 ── */
+  .lock-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 999; flex-direction: column; gap: 24px; }
+  .lock-box { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 36px 40px; width: 320px; text-align: center; }
+  .lock-icon { font-size: 32px; margin-bottom: 12px; }
+  .lock-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .lock-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+  .lock-input { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-size: 18px; padding: 12px; text-align: center; letter-spacing: 6px; outline: none; margin-bottom: 12px; font-family: monospace; }
+  .lock-input:focus { border-color: var(--accent); }
+  .lock-btn { width: 100%; padding: 11px; border-radius: var(--radius-sm); background: var(--accent); border: none; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity .15s; }
+  .lock-btn:hover { opacity: 0.88; }
+  .lock-error { font-size: 12px; color: var(--danger); margin-top: 8px; min-height: 16px; }
+
+  /* ── 앱 전체 ── */
+  #app { display: none; }
+
+  header { border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: rgba(15,15,17,0.95); backdrop-filter: blur(12px); z-index: 10; }
   .logo { font-size: 15px; font-weight: 600; }
   .logo span { color: var(--accent2); }
-  .badge { font-size: 10px; background: var(--danger); color: #fff; padding: 2px 7px; border-radius: 4px; margin-left: 8px; letter-spacing: 0.05em; }
+  .badge { font-size: 10px; background: var(--danger); color: #fff; padding: 2px 7px; border-radius: 4px; margin-left: 8px; }
   .back-link { font-size: 12px; color: var(--text3); text-decoration: none; border: 1px solid var(--border); padding: 5px 12px; border-radius: var(--radius-sm); transition: all .15s; }
   .back-link:hover { color: var(--text2); border-color: var(--border2); }
 
-  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 56px); }
-  .sidebar { border-right: 1px solid var(--border); padding: 24px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
-  .sidebar-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; padding: 0 20px; margin-bottom: 4px; }
+  .layout { display: grid; grid-template-columns: 210px 1fr; min-height: calc(100vh - 56px); }
+  .sidebar { border-right: 1px solid var(--border); padding: 20px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .sidebar-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; padding: 0 20px; margin-bottom: 4px; margin-top: 12px; }
+  .sidebar-label:first-child { margin-top: 0; }
   .sidebar-btn { width: 100%; padding: 8px 20px; text-align: left; background: transparent; border: none; cursor: pointer; font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 8px; transition: all .1s; border-left: 2px solid transparent; }
   .sidebar-btn:hover { color: var(--text); background: var(--bg2); }
   .sidebar-btn.active { color: var(--text); background: var(--bg3); border-left-color: var(--accent); }
-  .sidebar-divider { height: 1px; background: var(--border); margin: 12px 20px; }
+  .sidebar-btn.pinned-nav.active { border-left-color: var(--pinned-text); color: var(--pinned-text); }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 8px 20px; }
 
-  .main { padding: 32px 40px; max-width: 860px; }
+  .main { padding: 32px 40px; max-width: 900px; }
   .page { display: none; } .page.active { display: block; }
   .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
   .page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
 
   /* 버튼 */
-  .btn { padding: 8px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; font-size: 13px; transition: all .15s; }
+  .btn { padding: 7px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; font-size: 13px; transition: all .15s; }
   .btn:hover { background: var(--bg3); color: var(--text); }
   .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
-  .btn-danger { color: var(--danger); border-color: var(--danger); }
-  .btn-danger:hover { background: rgba(207,79,79,0.1); }
+  .btn-primary:hover { opacity: 0.88; color: #fff; background: var(--accent); }
+  .btn-danger { color: var(--danger); border-color: transparent; }
+  .btn-danger:hover { background: rgba(207,79,79,0.1); border-color: var(--danger); }
   .btn-success { background: var(--success); border-color: var(--success); color: #0f0f11; font-weight: 600; }
   .btn-success:hover { opacity: 0.9; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
 
   /* 폼 */
   .form-group { margin-bottom: 14px; }
-  label { display: block; font-size: 12px; color: var(--text3); margin-bottom: 5px; font-weight: 500; letter-spacing: 0.02em; }
-  input, textarea, select {
-    width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    color: var(--text); font-size: 13px; padding: 9px 12px; outline: none; transition: border-color .15s;
-    font-family: inherit;
-  }
+  label { display: block; font-size: 12px; color: var(--text3); margin-bottom: 5px; font-weight: 500; }
+  input, textarea, select { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 13px; padding: 9px 12px; outline: none; transition: border-color .15s; font-family: inherit; }
   input:focus, textarea:focus, select:focus { border-color: var(--border2); }
-  textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
-  .editor-wrap { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; transition: border-color .15s; }
-  .editor-wrap:focus-within { border-color: var(--border2); }
-  .editor-toolbar { display: flex; align-items: center; gap: 2px; padding: 6px 8px; background: var(--bg3); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-  .tb-btn { background: transparent; border: none; color: var(--text3); cursor: pointer; padding: 4px 7px; border-radius: 4px; font-size: 12px; font-family: inherit; line-height: 1; transition: all .1s; }
-  .tb-btn:hover { background: var(--bg2); color: var(--text); }
-  .tb-sep { width: 1px; height: 16px; background: var(--border); margin: 0 4px; }
-  .tb-img-label { background: transparent; border: none; color: var(--text3); cursor: pointer; padding: 4px 7px; border-radius: 4px; font-size: 12px; line-height: 1; transition: all .1s; display: flex; align-items: center; gap: 4px; }
-  .tb-img-label:hover { background: var(--bg2); color: var(--text); }
-  .editor-body { min-height: 260px; padding: 12px 14px; background: var(--bg2); color: var(--text); font-size: 13px; line-height: 1.75; outline: none; white-space: pre-wrap; overflow-y: auto; }
-  .editor-body img { max-width: 100%; border-radius: 6px; margin: 6px 0; display: block; }
-  .editor-body:empty:before { content: attr(data-placeholder); color: var(--text3); pointer-events: none; }
-  .editor-body code { background: var(--bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: monospace; color: var(--accent2); }
-  .editor-body hr { border: none; border-top: 1px solid var(--border2); margin: 10px 0; }
-  .img-drop-hint { font-size: 11px; color: var(--text3); padding: 4px 10px; }
   select option { background: var(--bg2); }
 
   /* 카드 */
   .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
   .card-info { flex: 1; min-width: 0; }
-  .card-title { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+  .card-title { font-size: 14px; font-weight: 500; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .card-meta { font-size: 12px; color: var(--text3); }
-  .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .card-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
 
-  .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
-  .tag-프로그래머 { background: #1e2a4a; color: #7aadff; }
-  .tag-아트 { background: #2a1e38; color: #c47aff; }
-  .tag-기획 { background: #1e2e1e; color: #7acf7a; }
-  .tag-공통 { background: #2a2a1e; color: #cfcf7a; }
-  .tag-중요 { background: #2e1e1e; color: #cf7a7a; }
-  .tag-공지 { background: #2e1e1e; color: #cf7a7a; }
-  .hashtag { display: inline-flex; align-items: center; gap: 4px; background: #1e2040; color: #a594f9; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; border: 1px solid #3a3060; }
+  .hashtag { display: inline-flex; align-items: center; gap: 3px; background: #1e2040; color: #a594f9; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; border: 1px solid #3a3060; }
   .hashtag .ht-remove { cursor: pointer; color: #7060c0; font-size: 14px; line-height: 1; }
   .hashtag .ht-remove:hover { color: #cf7a7a; }
   .hashtag-area { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); min-height: 42px; cursor: text; transition: border-color .15s; }
@@ -108,123 +95,323 @@
   .edit-panel-title { font-size: 13px; font-weight: 600; color: var(--accent2); margin-bottom: 14px; }
   .edit-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
 
+  /* 에디터 */
+  .editor-wrap { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; transition: border-color .15s; }
+  .editor-wrap:focus-within { border-color: var(--border2); }
+  .editor-toolbar { display: flex; align-items: center; gap: 2px; padding: 6px 8px; background: var(--bg3); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .tb-btn { background: transparent; border: none; color: var(--text3); cursor: pointer; padding: 4px 7px; border-radius: 4px; font-size: 12px; font-family: inherit; line-height: 1; transition: all .1s; }
+  .tb-btn:hover { background: var(--bg2); color: var(--text); }
+  .tb-sep { width: 1px; height: 16px; background: var(--border); margin: 0 4px; }
+  .tb-img-label { background: transparent; border: none; color: var(--text3); cursor: pointer; padding: 4px 7px; border-radius: 4px; font-size: 12px; line-height: 1; transition: all .1s; display: flex; align-items: center; gap: 4px; }
+  .tb-img-label:hover { background: var(--bg2); color: var(--text); }
+  .editor-body { min-height: 280px; max-height: 520px; padding: 14px 16px; background: var(--bg2); color: var(--text); font-size: 13px; line-height: 1.8; outline: none; overflow-y: auto; }
+  .editor-body img { max-width: 100%; border-radius: 6px; margin: 6px 0; display: block; }
+  .editor-body:empty:before { content: attr(data-placeholder); color: var(--text3); pointer-events: none; white-space: pre-line; }
+  .editor-body code { background: var(--bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: monospace; color: var(--accent2); }
+  .editor-body hr { border: none; border-top: 1px solid var(--border2); margin: 10px 0; }
+  .img-drop-hint { font-size: 11px; color: var(--text3); padding: 4px 8px; }
+
+  /* 탭 관리 */
+  .tab-manage-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .tab-manage-box h4 { font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--text2); }
+  .tab-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--bg3); border-radius: var(--radius-sm); margin-bottom: 6px; }
+  .tab-row-icon { font-size: 14px; width: 20px; text-align: center; }
+  .tab-row-label { flex: 1; font-size: 13px; color: var(--text); }
+  .tab-row-type { font-size: 10px; color: var(--text3); background: var(--bg); padding: 2px 6px; border-radius: 4px; }
+  .tab-row-actions { display: flex; gap: 4px; }
+  .new-tab-form { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .new-tab-form input { flex: 1; min-width: 120px; }
+  .new-tab-form select { width: 90px; flex-shrink: 0; }
+
   /* 내보내기 */
-  .export-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .export-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; }
   .export-box h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
   .export-box p { font-size: 12px; color: var(--text3); line-height: 1.7; margin-bottom: 14px; }
-  .export-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
   .step-list { counter-reset: steps; }
-  .step { display: flex; gap: 12px; margin-bottom: 12px; font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .step { display: flex; gap: 12px; margin-bottom: 10px; font-size: 13px; color: var(--text2); line-height: 1.7; }
   .step::before { counter-increment: steps; content: counter(steps); background: var(--accent); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
   code { background: var(--bg); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-family: monospace; color: var(--accent2); }
 
-  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); padding: 12px 18px; font-size: 13px; color: var(--text); z-index: 999; transform: translateY(60px); opacity: 0; transition: all .3s; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); padding: 12px 18px; font-size: 13px; color: var(--text); z-index: 9999; transform: translateY(60px); opacity: 0; transition: all .3s; pointer-events: none; }
   .toast.show { transform: translateY(0); opacity: 1; }
-
   .empty { text-align: center; padding: 32px 0; color: var(--text3); font-size: 13px; }
+  .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">팀 <span>라이브러리</span> <span class="badge">관리자</span></div>
-  <a class="back-link" href="index.html">← 라이브러리로</a>
-</header>
+<!-- 비밀번호 화면 -->
+<div class="lock-screen" id="lock-screen">
+  <div class="lock-box">
+    <div class="lock-icon">🔐</div>
+    <div class="lock-title">관리자 페이지</div>
+    <div class="lock-sub">비밀번호를 입력해 주세요</div>
+    <input class="lock-input" type="password" id="pw-input" placeholder="••••" maxlength="20"
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="lock-btn" onclick="checkPw()">입장</button>
+    <div class="lock-error" id="pw-error"></div>
+  </div>
+</div>
 
-<div class="layout">
-  <aside class="sidebar">
-    <div>
-      <div class="sidebar-label">문서 관리</div>
-      <button class="sidebar-btn active" onclick="showPage('engine')">⚙️ 엔진 기능</button>
-      <button class="sidebar-btn" onclick="showPage('prefab')">📦 프리팹 세팅</button>
-      <button class="sidebar-btn" onclick="showPage('tools')">🛠️ 협업 툴</button>
-    </div>
-    <div class="sidebar-divider"></div>
-    <div>
-      <div class="sidebar-label">소통 관리</div>
-      <button class="sidebar-btn" onclick="showPage('board')">💬 팀원 공간</button>
-    </div>
-    <div class="sidebar-divider"></div>
-    <div>
-      <div class="sidebar-label">배포</div>
-      <button class="sidebar-btn" onclick="showPage('export')">📤 내보내기</button>
-    </div>
-  </aside>
+<!-- 앱 본체 -->
+<div id="app">
+  <header>
+    <div class="logo">팀 <span>라이브러리</span> <span class="badge">관리자</span></div>
+    <a class="back-link" href="index.html">← 라이브러리로</a>
+  </header>
 
-  <main class="main">
-    <div id="page-engine" class="page active"></div>
-    <div id="page-prefab" class="page"></div>
-    <div id="page-tools" class="page"></div>
-    <div id="page-board" class="page"></div>
-    <div id="page-export" class="page">
-      <div class="page-header"><div class="page-title">📤 내보내기 & 배포</div></div>
-      <div class="export-box">
-        <h3>1단계 — data.json 다운로드</h3>
-        <p>수정한 내용을 data.json 파일로 저장하세요.<br>이 파일을 GitHub 리포지토리에 올리면 라이브러리에 자동 반영됩니다.</p>
-        <div class="export-actions">
+  <div class="layout">
+    <aside class="sidebar" id="admin-sidebar"></aside>
+    <main class="main" id="admin-main">
+      <!-- 탭 관리 페이지 -->
+      <div id="page-tab-manage" class="page">
+        <div class="page-header"><div class="page-title">🗂 탭 관리</div></div>
+
+        <div class="tab-manage-box">
+          <h4>📌 필독 탭 목록</h4>
+          <div id="pinned-tab-list"></div>
+          <div class="new-tab-form" id="new-pinned-form">
+            <input id="new-pinned-icon" placeholder="아이콘 (예: 📋)" style="width:70px;flex:none">
+            <input id="new-pinned-label" placeholder="탭 이름">
+            <input id="new-pinned-desc" placeholder="탭 설명">
+            <button class="btn btn-primary btn-sm" onclick="addNewTab('pinned')">+ 추가</button>
+          </div>
+        </div>
+
+        <div class="tab-manage-box">
+          <h4>📁 문서 탭 목록</h4>
+          <div id="doc-tab-list"></div>
+          <div class="new-tab-form">
+            <input id="new-doc-icon" placeholder="아이콘 (예: 📝)" style="width:70px;flex:none">
+            <input id="new-doc-label" placeholder="탭 이름">
+            <input id="new-doc-desc" placeholder="탭 설명">
+            <button class="btn btn-primary btn-sm" onclick="addNewTab('doc')">+ 추가</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 내보내기 페이지 -->
+      <div id="page-export" class="page">
+        <div class="page-header"><div class="page-title">📤 내보내기 & 배포</div></div>
+        <div class="export-box">
+          <h3>1단계 — data.json 다운로드</h3>
+          <p>수정한 내용을 data.json 파일로 저장하세요.<br>GitHub 리포지토리에 올리면 자동 반영됩니다.</p>
           <button class="btn btn-success" onclick="downloadJSON()">⬇ data.json 다운로드</button>
         </div>
-      </div>
-      <div class="export-box">
-        <h3>2단계 — GitHub에 올리기</h3>
-        <div class="step-list">
-          <div class="step">GitHub 리포지토리에서 <code>data.json</code> 파일을 클릭</div>
-          <div class="step">연필 아이콘(편집) 클릭 → 기존 내용 전체 선택 후 삭제</div>
-          <div class="step">다운로드한 파일 내용을 붙여넣기</div>
-          <div class="step"><code>Commit changes</code> 버튼 클릭 → 완료!</div>
+        <div class="export-box">
+          <h3>2단계 — GitHub에 올리기</h3>
+          <div class="step-list">
+            <div class="step">GitHub 리포지토리에서 <code>data.json</code> 파일을 클릭</div>
+            <div class="step">연필 아이콘 클릭 → 기존 내용 전체 삭제 후 붙여넣기</div>
+            <div class="step"><code>Commit changes</code> 클릭 → 완료!</div>
+          </div>
+        </div>
+        <div class="export-box">
+          <h3>처음 GitHub Pages 설정</h3>
+          <div class="step-list">
+            <div class="step">GitHub에서 새 리포지토리 생성 (Public)</div>
+            <div class="step"><code>index.html</code>, <code>admin.html</code>, <code>data.json</code> 업로드</div>
+            <div class="step">Settings → Pages → Branch: <code>main</code> → Save</div>
+            <div class="step">몇 분 후 <code>https://유저명.github.io/리포명</code> 접속 가능</div>
+          </div>
         </div>
       </div>
-      <div class="export-box">
-        <h3>처음 GitHub Pages 설정하는 방법</h3>
-        <div class="step-list">
-          <div class="step">GitHub에서 새 리포지토리 생성 (Public으로 설정)</div>
-          <div class="step"><code>index.html</code>, <code>admin.html</code>, <code>data.json</code> 3개 파일 업로드</div>
-          <div class="step">리포지토리 → Settings → Pages → Branch: <code>main</code> 선택 → Save</div>
-          <div class="step">몇 분 후 <code>https://유저명.github.io/리포명</code> 으로 접속 가능</div>
-        </div>
-      </div>
-    </div>
-  </main>
+
+      <!-- 동적 섹션 페이지들은 JS로 생성 -->
+    </main>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const TAG_OPTIONS = ['프로그래머', '아트', '기획', '공통', '중요'];
+const ADMIN_PW = '1009';
 const POST_TAGS = ['공지', '공통', '중요'];
+const SUGGEST_TAGS = ['프로그래머', '아트', '기획', '공통', '중요', 'Unity', 'UI', '버그', '참고', '필독'];
 
 let data = null;
-let editing = null;
+let currentTags = [];
 
+/* ── 비밀번호 ── */
+function checkPw() {
+  const val = document.getElementById('pw-input').value;
+  if (val === ADMIN_PW) {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadData();
+  } else {
+    document.getElementById('pw-error').textContent = '비밀번호가 틀렸습니다.';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+    setTimeout(() => document.getElementById('pw-error').textContent = '', 2000);
+  }
+}
+
+/* ── 데이터 ── */
 async function loadData() {
   try {
     const res = await fetch('./data.json?t=' + Date.now());
     data = await res.json();
   } catch(e) {
     data = {
-      team: { name: "팀 라이브러리", members: [] },
+      team: { name: '팀 라이브러리', members: [] },
       sections: {
-        engine: { label: "엔진 기능", icon: "⚙️", items: [] },
-        prefab: { label: "프리팹 세팅", icon: "📦", items: [] },
-        tools: { label: "협업 툴", icon: "🛠️", items: [] }
+        pinned: { label: '필독', icon: '📌', desc: '', pinned: true, items: [] },
+        setup:  { label: '초기 세팅', icon: '🔧', desc: '', pinned: true, items: [] },
+        engine: { label: '엔진 기능', icon: '⚙️', desc: '', items: [] },
+        prefab: { label: '프리팹 세팅', icon: '📦', desc: '', items: [] },
+        tools:  { label: '협업 툴', icon: '🛠️', desc: '', items: [] }
       },
+      tabs: { pinned_order: ['pinned','setup'], doc_order: ['engine','prefab','tools'] },
       board: { posts: [] }
     };
   }
-  renderAll();
+  if (!data.tabs) data.tabs = { pinned_order: [], doc_order: [] };
+  buildAdminUI();
 }
 
-function renderAll() {
-  renderSection('engine');
-  renderSection('prefab');
-  renderSection('tools');
-  renderBoard();
+/* ── 사이드바 + 페이지 생성 ── */
+function buildAdminUI() {
+  const { pinned_order, doc_order } = data.tabs;
+  const sidebar = document.getElementById('admin-sidebar');
+  const main = document.getElementById('admin-main');
+
+  // 기존 동적 페이지 제거
+  main.querySelectorAll('.dyn-page').forEach(el => el.remove());
+
+  let sb = '';
+
+  sb += `<div class="sidebar-label">탭 관리</div>`;
+  sb += `<button class="sidebar-btn" id="nav-tab-manage" onclick="showAdminPage('tab-manage')">🗂 탭 관리</button>`;
+  sb += `<div class="sidebar-divider"></div>`;
+
+  if (pinned_order.length) {
+    sb += `<div class="sidebar-label">필독</div>`;
+    pinned_order.forEach(key => {
+      const sec = data.sections[key]; if (!sec) return;
+      sb += `<button class="sidebar-btn pinned-nav" id="nav-${key}" onclick="showAdminPage('${key}')">${sec.icon} ${sec.label}</button>`;
+      insertDynPage(main, key);
+    });
+    sb += `<div class="sidebar-divider"></div>`;
+  }
+
+  if (doc_order.length) {
+    sb += `<div class="sidebar-label">문서</div>`;
+    doc_order.forEach(key => {
+      const sec = data.sections[key]; if (!sec) return;
+      sb += `<button class="sidebar-btn" id="nav-${key}" onclick="showAdminPage('${key}')">${sec.icon} ${sec.label}</button>`;
+      insertDynPage(main, key);
+    });
+    sb += `<div class="sidebar-divider"></div>`;
+  }
+
+  sb += `<div class="sidebar-label">소통</div>`;
+  sb += `<button class="sidebar-btn" id="nav-board" onclick="showAdminPage('board')">💬 팀원 공간</button>`;
+  insertDynPage(main, 'board');
+  sb += `<div class="sidebar-divider"></div>`;
+
+  sb += `<div class="sidebar-label">배포</div>`;
+  sb += `<button class="sidebar-btn" id="nav-export" onclick="showAdminPage('export')">📤 내보내기</button>`;
+
+  sidebar.innerHTML = sb;
+
+  // 섹션 렌더
+  [...pinned_order, ...doc_order].forEach(key => {
+    if (data.sections[key]) renderAdminSection(key);
+  });
+  renderAdminBoard();
+  renderTabManage();
+
+  showAdminPage('tab-manage');
 }
 
-function renderSection(key) {
+function insertDynPage(main, key) {
+  if (!document.getElementById('page-' + key)) {
+    const div = document.createElement('div');
+    div.id = 'page-' + key;
+    div.className = 'page dyn-page';
+    main.appendChild(div);
+  }
+}
+
+function showAdminPage(key) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  const page = document.getElementById('page-' + key);
+  const btn = document.getElementById('nav-' + key);
+  if (page) page.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+/* ── 탭 관리 ── */
+function renderTabManage() {
+  const { pinned_order, doc_order } = data.tabs;
+
+  function rowHTML(key, type) {
+    const sec = data.sections[key]; if (!sec) return '';
+    return `<div class="tab-row" id="tabrow-${key}">
+      <span class="tab-row-icon">${sec.icon}</span>
+      <span class="tab-row-label">${sec.label}</span>
+      <span class="tab-row-type">${type === 'pinned' ? '필독' : '문서'}</span>
+      <div class="tab-row-actions">
+        <button class="btn btn-sm" onclick="moveTab('${key}','${type}',-1)" title="위로">↑</button>
+        <button class="btn btn-sm" onclick="moveTab('${key}','${type}',1)" title="아래로">↓</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteTab('${key}','${type}')">삭제</button>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('pinned-tab-list').innerHTML =
+    pinned_order.length ? pinned_order.map(k => rowHTML(k, 'pinned')).join('') : '<div class="empty" style="padding:12px">탭이 없어요</div>';
+  document.getElementById('doc-tab-list').innerHTML =
+    doc_order.length ? doc_order.map(k => rowHTML(k, 'doc')).join('') : '<div class="empty" style="padding:12px">탭이 없어요</div>';
+}
+
+function addNewTab(type) {
+  const iconEl = document.getElementById(`new-${type}-icon`);
+  const labelEl = document.getElementById(`new-${type}-label`);
+  const descEl = document.getElementById(`new-${type}-desc`);
+  const label = labelEl.value.trim();
+  if (!label) { toast('탭 이름을 입력해 주세요'); return; }
+  const icon = iconEl.value.trim() || (type === 'pinned' ? '📌' : '📁');
+  const key = 'custom_' + Date.now();
+  data.sections[key] = { label, icon, desc: descEl.value.trim(), pinned: type === 'pinned', items: [] };
+  if (type === 'pinned') data.tabs.pinned_order.push(key);
+  else data.tabs.doc_order.push(key);
+  iconEl.value = ''; labelEl.value = ''; descEl.value = '';
+  buildAdminUI();
+  showAdminPage('tab-manage');
+  toast(`"${label}" 탭 추가 완료!`);
+}
+
+function moveTab(key, type, dir) {
+  const arr = type === 'pinned' ? data.tabs.pinned_order : data.tabs.doc_order;
+  const i = arr.indexOf(key);
+  if (i < 0) return;
+  const ni = i + dir;
+  if (ni < 0 || ni >= arr.length) return;
+  [arr[i], arr[ni]] = [arr[ni], arr[i]];
+  buildAdminUI();
+  showAdminPage('tab-manage');
+}
+
+function deleteTab(key, type) {
+  const sec = data.sections[key];
+  if (!confirm(`"${sec?.label}" 탭을 삭제할까요?\n탭 안의 항목도 모두 삭제됩니다.`)) return;
+  const arr = type === 'pinned' ? data.tabs.pinned_order : data.tabs.doc_order;
+  const i = arr.indexOf(key);
+  if (i >= 0) arr.splice(i, 1);
+  delete data.sections[key];
+  buildAdminUI();
+  showAdminPage('tab-manage');
+  toast('탭 삭제 완료');
+}
+
+/* ── 섹션 항목 렌더 ── */
+function renderAdminSection(key) {
   const sec = data.sections[key];
   const el = document.getElementById('page-' + key);
+  if (!el) return;
   const items = sec.items || [];
   el.innerHTML = `
     <div class="page-header">
@@ -233,26 +420,43 @@ function renderSection(key) {
     </div>
     <div id="form-${key}"></div>
     <div id="list-${key}">
-      ${items.length === 0 ? '<div class="empty">항목이 없어요. 추가해 보세요.</div>'
+      ${items.length === 0 ? '<div class="empty">항목이 없어요.</div>'
         : items.map((item, i) => {
           const tags = Array.isArray(item.tags) ? item.tags : (item.tag ? [item.tag] : []);
           const tagHTML = tags.map(t => `<span class="hashtag">#${t}</span>`).join('');
-          return `<div class="card">
-          <div class="card-info">
-            <div class="card-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${item.title} ${tagHTML}</div>
-            <div class="card-meta">${item.author} · ${item.date}</div>
-          </div>
-          <div class="card-actions">
-            <button class="btn" onclick="showEditForm('${key}',${i})">수정</button>
-            <button class="btn btn-danger" onclick="deleteItem('${key}',${i})">삭제</button>
-          </div>
-        </div>`;}).join('')}
+          const isFirst = i === 0;
+          const isLast = i === items.length - 1;
+          return `<div class="card" id="item-card-${key}-${i}">
+            <div class="card-order" style="display:flex;flex-direction:column;gap:2px;flex-shrink:0;margin-right:4px">
+              <button class="btn btn-sm" onclick="moveItem('${key}',${i},-1)" ${isFirst ? 'disabled style="opacity:0.25;cursor:default"' : ''} title="위로">↑</button>
+              <button class="btn btn-sm" onclick="moveItem('${key}',${i},1)" ${isLast ? 'disabled style="opacity:0.25;cursor:default"' : ''} title="아래로">↓</button>
+            </div>
+            <div class="card-info">
+              <div class="card-title">${item.title} ${tagHTML}</div>
+              <div class="card-meta">${item.author || ''} · ${item.date || ''}</div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-sm" onclick="showEditForm('${key}',${i})">수정</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteItem('${key}',${i})">삭제</button>
+            </div>
+          </div>`;
+        }).join('')}
     </div>`;
 }
 
+function moveItem(key, i, dir) {
+  const items = data.sections[key].items;
+  const ni = i + dir;
+  if (ni < 0 || ni >= items.length) return;
+  [items[i], items[ni]] = [items[ni], items[i]];
+  renderAdminSection(key);
+}
+
+/* ── 항목 폼 ── */
 function showAddForm(key) {
   document.getElementById('form-' + key).innerHTML = buildEntryForm(key, null, -1);
   setTimeout(() => { initTagInput(); initEditor(); }, 0);
+  document.getElementById('form-' + key).scrollIntoView({ behavior: 'smooth' });
 }
 
 function showEditForm(key, i) {
@@ -262,45 +466,39 @@ function showEditForm(key, i) {
   document.getElementById('form-' + key).scrollIntoView({ behavior: 'smooth' });
 }
 
-let currentTags = [];
-
 function buildEntryForm(key, item, idx) {
   const isEdit = idx >= 0;
-  const existingTags = isEdit ? (Array.isArray(item.tags) ? item.tags : (item.tag ? [item.tag] : [])) : [];
-  currentTags = [...existingTags];
-  const SUGGEST = ['프로그래머', '아트', '기획', '공통', '중요', 'Unity', 'UI', '버그', '참고', '필독'];
+  const existing = isEdit ? (Array.isArray(item.tags) ? item.tags : (item.tag ? [item.tag] : [])) : [];
+  currentTags = [...existing];
   return `<div class="edit-panel">
     <div class="edit-panel-title">${isEdit ? '항목 수정' : '새 항목 추가'}</div>
     <div class="form-group"><label>제목</label><input id="f-title" value="${isEdit ? esc(item.title) : ''}"></div>
-    <div class="form-group"><label>작성자</label><input id="f-author" value="${isEdit ? esc(item.author) : ''}"></div>
+    <div class="form-group"><label>작성자</label><input id="f-author" value="${isEdit ? esc(item.author||'') : ''}"></div>
     <div class="form-group">
-      <label>해시태그 <span style="color:var(--text3);font-weight:400">— 입력 후 Enter 또는 Space로 추가</span></label>
+      <label>해시태그 <span style="color:var(--text3);font-weight:400">— Enter 또는 Space로 추가</span></label>
       <div class="hashtag-area" id="hashtag-area" onclick="document.getElementById('f-tag-input').focus()">
         <input class="hashtag-input" id="f-tag-input" placeholder="#태그입력..." autocomplete="off">
       </div>
-      <div class="tag-suggestions" id="tag-suggestions">
-        ${SUGGEST.map(t => `<button type="button" class="tag-suggest-btn" onclick="addTag('${t}')">#${t}</button>`).join('')}
+      <div class="tag-suggestions">
+        ${SUGGEST_TAGS.map(t => `<button type="button" class="tag-suggest-btn" onclick="addTag('${t}')">#${t}</button>`).join('')}
       </div>
     </div>
     <div class="form-group">
       <label>내용</label>
-      <div class="editor-wrap" id="editor-wrap">
+      <div class="editor-wrap">
         <div class="editor-toolbar">
-          <button type="button" class="tb-btn" onclick="edFmt('bold')" title="굵게"><b>B</b></button>
-          <button type="button" class="tb-btn" onclick="edFmt('italic')" title="기울임"><i>I</i></button>
-          <button type="button" class="tb-btn" onclick="edFmt('underline')" title="밑줄"><u>U</u></button>
+          <button type="button" class="tb-btn" onclick="edFmt('bold')"><b>B</b></button>
+          <button type="button" class="tb-btn" onclick="edFmt('italic')"><i>I</i></button>
+          <button type="button" class="tb-btn" onclick="edFmt('underline')"><u>U</u></button>
           <div class="tb-sep"></div>
-          <button type="button" class="tb-btn" onclick="edCode()" title="인라인 코드"><span style="font-family:monospace;font-size:11px">&lt;/&gt;</span></button>
-          <button type="button" class="tb-btn" onclick="edHr()" title="구분선">—</button>
+          <button type="button" class="tb-btn" onclick="edCode()" style="font-family:monospace;font-size:11px">&lt;/&gt;</button>
+          <button type="button" class="tb-btn" onclick="edHr()">—</button>
           <div class="tb-sep"></div>
-          <label class="tb-img-label" title="이미지 삽입">
-            🖼 이미지
-            <input type="file" id="img-upload" accept="image/*" style="display:none" onchange="insertImageFile(this)">
-          </label>
+          <label class="tb-img-label">🖼 이미지<input type="file" id="img-upload" accept="image/*" style="display:none" onchange="insertImageFile(this)"></label>
           <span class="img-drop-hint">또는 드래그 앤 드롭</span>
         </div>
-        <div class="editor-body" id="f-body" contenteditable="true" data-placeholder="내용을 입력하세요...
-이미지는 툴바 버튼 또는 드래그 앤 드롭으로 삽입할 수 있어요.">${isEdit ? (item.body || '') : ''}</div>
+        <div class="editor-body" id="f-body" contenteditable="true"
+          data-placeholder="내용을 입력하세요...">${isEdit ? (item.body || '') : ''}</div>
       </div>
     </div>
     <div class="edit-actions">
@@ -310,6 +508,35 @@ function buildEntryForm(key, item, idx) {
   </div>`;
 }
 
+function cancelForm(key) { document.getElementById('form-' + key).innerHTML = ''; }
+
+function saveItem(key, idx) {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { toast('제목을 입력해 주세요'); return; }
+  const bodyEl = document.getElementById('f-body');
+  const item = {
+    id: idx >= 0 ? data.sections[key].items[idx].id : Date.now(),
+    title,
+    author: document.getElementById('f-author').value.trim(),
+    tags: [...currentTags],
+    date: new Date().toLocaleDateString('ko-KR'),
+    body: bodyEl ? bodyEl.innerHTML.trim() : ''
+  };
+  if (idx >= 0) data.sections[key].items[idx] = item;
+  else data.sections[key].items.push(item);
+  cancelForm(key);
+  renderAdminSection(key);
+  toast(idx >= 0 ? '수정 완료!' : '추가 완료!');
+}
+
+function deleteItem(key, i) {
+  if (!confirm('삭제할까요?')) return;
+  data.sections[key].items.splice(i, 1);
+  renderAdminSection(key);
+  toast('삭제 완료');
+}
+
+/* ── 해시태그 ── */
 function renderTagChips() {
   const area = document.getElementById('hashtag-area');
   if (!area) return;
@@ -332,10 +559,7 @@ function addTag(raw) {
   renderTagChips();
 }
 
-function removeTag(i) {
-  currentTags.splice(i, 1);
-  renderTagChips();
-}
+function removeTag(i) { currentTags.splice(i, 1); renderTagChips(); }
 
 function initTagInput() {
   const input = document.getElementById('f-tag-input');
@@ -347,11 +571,10 @@ function initTagInput() {
       const val = input.value.replace(/^#+/, '').trim();
       if (val) { addTag(val); input.value = ''; }
     } else if (e.key === 'Backspace' && input.value === '' && currentTags.length > 0) {
-      currentTags.pop();
-      renderTagChips();
+      currentTags.pop(); renderTagChips();
     }
   });
-  input.addEventListener('input', e => {
+  input.addEventListener('input', () => {
     if (input.value.endsWith(' ')) {
       const val = input.value.replace(/^#+/, '').trim();
       if (val) { addTag(val); input.value = ''; }
@@ -359,117 +582,64 @@ function initTagInput() {
   });
 }
 
+/* ── 에디터 ── */
 function initEditor() {
   const body = document.getElementById('f-body');
   if (!body) return;
-
-  // 드래그 앤 드롭 이미지
   body.addEventListener('dragover', e => { e.preventDefault(); body.style.outline = '2px dashed var(--accent)'; });
-  body.addEventListener('dragleave', e => { body.style.outline = ''; });
+  body.addEventListener('dragleave', () => { body.style.outline = ''; });
   body.addEventListener('drop', e => {
-    e.preventDefault();
-    body.style.outline = '';
-    const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
-    files.forEach(f => insertImageFromFile(f));
+    e.preventDefault(); body.style.outline = '';
+    [...e.dataTransfer.files].filter(f => f.type.startsWith('image/')).forEach(insertImageFromFile);
   });
-
-  // 클립보드 붙여넣기 이미지
   body.addEventListener('paste', e => {
     const items = [...e.clipboardData.items].filter(i => i.type.startsWith('image/'));
-    if (items.length) {
-      e.preventDefault();
-      items.forEach(i => insertImageFromFile(i.getAsFile()));
-    }
+    if (items.length) { e.preventDefault(); items.forEach(i => insertImageFromFile(i.getAsFile())); }
   });
 }
 
-function edFmt(cmd) {
-  document.getElementById('f-body').focus();
-  document.execCommand(cmd, false, null);
-}
-
+function edFmt(cmd) { document.getElementById('f-body').focus(); document.execCommand(cmd, false, null); }
 function edCode() {
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
   const range = sel.getRangeAt(0);
-  const text = range.toString();
-  if (!text) return;
+  const text = range.toString(); if (!text) return;
   const code = document.createElement('code');
   code.textContent = text;
-  range.deleteContents();
-  range.insertNode(code);
+  range.deleteContents(); range.insertNode(code);
   sel.collapseToEnd();
 }
-
-function edHr() {
-  const body = document.getElementById('f-body');
-  body.focus();
-  document.execCommand('insertHTML', false, '<hr>');
-}
+function edHr() { document.getElementById('f-body').focus(); document.execCommand('insertHTML', false, '<hr>'); }
 
 function insertImageFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  insertImageFromFile(file);
-  input.value = '';
+  const file = input.files[0]; if (!file) return;
+  insertImageFromFile(file); input.value = '';
 }
-
 function insertImageFromFile(file) {
   const reader = new FileReader();
   reader.onload = e => {
-    const body = document.getElementById('f-body');
+    const body = document.getElementById('f-body'); if (!body) return;
     body.focus();
     const img = document.createElement('img');
-    img.src = e.target.result;
-    img.style.maxWidth = '100%';
+    img.src = e.target.result; img.style.maxWidth = '100%';
     const sel = window.getSelection();
     if (sel.rangeCount) {
       const range = sel.getRangeAt(0);
-      range.collapse(false);
-      range.insertNode(img);
-      range.setStartAfter(img);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    } else {
-      body.appendChild(img);
-    }
+      range.collapse(false); range.insertNode(img);
+      range.setStartAfter(img); range.collapse(true);
+      sel.removeAllRanges(); sel.addRange(range);
+    } else { body.appendChild(img); }
     toast('이미지 삽입 완료!');
   };
   reader.readAsDataURL(file);
 }
 
-function saveItem(key, idx) {
-  const title = document.getElementById('f-title').value.trim();
-  if (!title) { toast('제목을 입력해 주세요'); return; }
-  const bodyEl = document.getElementById('f-body');
-  const item = {
-    id: idx >= 0 ? data.sections[key].items[idx].id : Date.now(),
-    title,
-    author: document.getElementById('f-author').value.trim(),
-    tags: [...currentTags],
-    date: new Date().toLocaleDateString('ko-KR'),
-    body: bodyEl ? bodyEl.innerHTML.trim() : ''
-  };
-  if (idx >= 0) data.sections[key].items[idx] = item;
-  else data.sections[key].items.push(item);
-  cancelForm(key);
-  renderSection(key);
-  toast(idx >= 0 ? '수정 완료!' : '추가 완료!');
-}
-
-function deleteItem(key, i) {
-  if (!confirm('삭제할까요?')) return;
-  data.sections[key].items.splice(i, 1);
-  renderSection(key);
-  toast('삭제 완료');
-}
-
-function cancelForm(key) { document.getElementById('form-' + key).innerHTML = ''; }
-
-function renderBoard() {
+/* ── 게시판 ── */
+function renderAdminBoard() {
   const el = document.getElementById('page-board');
+  if (!el) return;
   const posts = (data.board && data.board.posts) || [];
+  const members = (data.team && data.team.members) || [];
   el.innerHTML = `
     <div class="page-header">
       <div class="page-title">💬 팀원 공간</div>
@@ -482,11 +652,11 @@ function renderBoard() {
           const i = posts.length - 1 - ri;
           return `<div class="card">
             <div class="card-info">
-              <div class="card-title">${p.title} ${p.tag ? `<span class="tag tag-${p.tag}">${p.tag}</span>` : ''}</div>
+              <div class="card-title">${p.title}${p.tag ? ` <span class="tag">${p.tag}</span>` : ''}</div>
               <div class="card-meta">${p.author} · ${p.date}</div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-danger" onclick="deletePost(${i})">삭제</button>
+              <button class="btn btn-sm btn-danger" onclick="deletePost(${i})">삭제</button>
             </div>
           </div>`;
         }).join('')}
@@ -506,7 +676,7 @@ function showAddPost() {
       <select id="f-ptag"><option value="">없음</option>${POST_TAGS.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
     </div>
     <div class="form-group"><label>제목</label><input id="f-ptitle"></div>
-    <div class="form-group"><label>내용</label><textarea id="f-pbody" rows="4"></textarea></div>
+    <div class="form-group"><label>내용</label><textarea id="f-pbody" rows="4" style="min-height:80px"></textarea></div>
     <div class="edit-actions">
       <button class="btn" onclick="document.getElementById('form-board').innerHTML=''">취소</button>
       <button class="btn btn-primary" onclick="savePost()">게시</button>
@@ -519,30 +689,24 @@ function savePost() {
   if (!title) { toast('제목을 입력해 주세요'); return; }
   const authorEl = document.getElementById('f-pauthor');
   const authorColor = authorEl.tagName === 'SELECT'
-    ? (authorEl.options[authorEl.selectedIndex].dataset.color || '#7c6af7')
-    : '#7c6af7';
-  const post = {
-    id: Date.now(),
-    author: authorEl.value.trim(),
-    authorColor,
-    tag: document.getElementById('f-ptag').value,
-    title,
-    body: document.getElementById('f-pbody').value.trim(),
-    date: new Date().toLocaleDateString('ko-KR')
-  };
+    ? (authorEl.options[authorEl.selectedIndex]?.dataset.color || '#7c6af7') : '#7c6af7';
   if (!data.board) data.board = { posts: [] };
-  data.board.posts.push(post);
-  renderBoard();
-  toast('게시 완료!');
+  data.board.posts.push({
+    id: Date.now(), author: authorEl.value.trim(), authorColor,
+    tag: document.getElementById('f-ptag').value,
+    title, body: document.getElementById('f-pbody').value.trim(),
+    date: new Date().toLocaleDateString('ko-KR')
+  });
+  renderAdminBoard(); toast('게시 완료!');
 }
 
 function deletePost(i) {
   if (!confirm('삭제할까요?')) return;
   data.board.posts.splice(i, 1);
-  renderBoard();
-  toast('삭제 완료');
+  renderAdminBoard(); toast('삭제 완료');
 }
 
+/* ── 내보내기 ── */
 function downloadJSON() {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
@@ -552,23 +716,17 @@ function downloadJSON() {
   toast('다운로드 완료! GitHub에 올려주세요 🚀');
 }
 
-function showPage(key) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + key).classList.add('active');
-  event.currentTarget.classList.add('active');
-}
-
+/* ── 유틸 ── */
 function esc(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function toast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-loadData();
+// 엔터로 비밀번호
+document.getElementById('pw-input').focus();
 </script>
 </body>
 </html>
