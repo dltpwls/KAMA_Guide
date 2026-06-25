@@ -198,10 +198,7 @@ function renderSection(key) {
   const el = document.getElementById('page-' + key);
   if (!el) return;
   const items = sec.items || [];
-  const isPinned = sec.pinned;
-  const bannerHTML = isPinned
-    ? `<div class="pinned-banner">📌 필독 문서입니다. 팀원 모두 꼭 확인해 주세요.</div>`
-    : '';
+  const bannerHTML = '';
   el.innerHTML = `
     <div class="page-header">
       <div class="page-title">${sec.icon} ${sec.label}</div>
