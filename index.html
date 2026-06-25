@@ -135,9 +135,13 @@
     font-size: 13px;
     color: var(--text2);
     line-height: 1.75;
-    white-space: pre-wrap;
     border-top: 1px solid var(--border);
   }
+  .card-body img { max-width: 100%; border-radius: 6px; margin: 8px 0; display: block; }
+  .card-body code { background: var(--bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: monospace; color: var(--accent2); }
+  .card-body hr { border: none; border-top: 1px solid var(--border2); margin: 10px 0; }
+  .card-body b, .card-body strong { color: var(--text); font-weight: 600; }
+  .card-body i, .card-body em { color: var(--text2); }
   .card-body.open { display: block; padding-top: 14px; }
 
   .tag {
@@ -284,7 +288,7 @@ function renderCard(key, item, i) {
       </div>
       <span class="card-chevron" id="chev-${key}-${i}">▼</span>
     </div>
-    <div class="card-body" id="body-${key}-${i}">${item.body}</div>
+    <div class="card-body" id="body-${key}-${i}">${item.body || ''}</div>
   </div>`;
 }
 

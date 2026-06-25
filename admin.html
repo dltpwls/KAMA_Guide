@@ -62,6 +62,20 @@
   }
   input:focus, textarea:focus, select:focus { border-color: var(--border2); }
   textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+  .editor-wrap { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; transition: border-color .15s; }
+  .editor-wrap:focus-within { border-color: var(--border2); }
+  .editor-toolbar { display: flex; align-items: center; gap: 2px; padding: 6px 8px; background: var(--bg3); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .tb-btn { background: transparent; border: none; color: var(--text3); cursor: pointer; padding: 4px 7px; border-radius: 4px; font-size: 12px; font-family: inherit; line-height: 1; transition: all .1s; }
+  .tb-btn:hover { background: var(--bg2); color: var(--text); }
+  .tb-sep { width: 1px; height: 16px; background: var(--border); margin: 0 4px; }
+  .tb-img-label { background: transparent; border: none; color: var(--text3); cursor: pointer; padding: 4px 7px; border-radius: 4px; font-size: 12px; line-height: 1; transition: all .1s; display: flex; align-items: center; gap: 4px; }
+  .tb-img-label:hover { background: var(--bg2); color: var(--text); }
+  .editor-body { min-height: 260px; padding: 12px 14px; background: var(--bg2); color: var(--text); font-size: 13px; line-height: 1.75; outline: none; white-space: pre-wrap; overflow-y: auto; }
+  .editor-body img { max-width: 100%; border-radius: 6px; margin: 6px 0; display: block; }
+  .editor-body:empty:before { content: attr(data-placeholder); color: var(--text3); pointer-events: none; }
+  .editor-body code { background: var(--bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: monospace; color: var(--accent2); }
+  .editor-body hr { border: none; border-top: 1px solid var(--border2); margin: 10px 0; }
+  .img-drop-hint { font-size: 11px; color: var(--text3); padding: 4px 10px; }
   select option { background: var(--bg2); }
 
   /* 카드 */
@@ -238,13 +252,13 @@ function renderSection(key) {
 
 function showAddForm(key) {
   document.getElementById('form-' + key).innerHTML = buildEntryForm(key, null, -1);
-  setTimeout(() => initTagInput(), 0);
+  setTimeout(() => { initTagInput(); initEditor(); }, 0);
 }
 
 function showEditForm(key, i) {
   const item = data.sections[key].items[i];
   document.getElementById('form-' + key).innerHTML = buildEntryForm(key, item, i);
-  setTimeout(() => initTagInput(), 0);
+  setTimeout(() => { initTagInput(); initEditor(); }, 0);
   document.getElementById('form-' + key).scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -268,7 +282,27 @@ function buildEntryForm(key, item, idx) {
         ${SUGGEST.map(t => `<button type="button" class="tag-suggest-btn" onclick="addTag('${t}')">#${t}</button>`).join('')}
       </div>
     </div>
-    <div class="form-group"><label>내용</label><textarea id="f-body" rows="5">${isEdit ? esc(item.body) : ''}</textarea></div>
+    <div class="form-group">
+      <label>내용</label>
+      <div class="editor-wrap" id="editor-wrap">
+        <div class="editor-toolbar">
+          <button type="button" class="tb-btn" onclick="edFmt('bold')" title="굵게"><b>B</b></button>
+          <button type="button" class="tb-btn" onclick="edFmt('italic')" title="기울임"><i>I</i></button>
+          <button type="button" class="tb-btn" onclick="edFmt('underline')" title="밑줄"><u>U</u></button>
+          <div class="tb-sep"></div>
+          <button type="button" class="tb-btn" onclick="edCode()" title="인라인 코드"><span style="font-family:monospace;font-size:11px">&lt;/&gt;</span></button>
+          <button type="button" class="tb-btn" onclick="edHr()" title="구분선">—</button>
+          <div class="tb-sep"></div>
+          <label class="tb-img-label" title="이미지 삽입">
+            🖼 이미지
+            <input type="file" id="img-upload" accept="image/*" style="display:none" onchange="insertImageFile(this)">
+          </label>
+          <span class="img-drop-hint">또는 드래그 앤 드롭</span>
+        </div>
+        <div class="editor-body" id="f-body" contenteditable="true" data-placeholder="내용을 입력하세요...
+이미지는 툴바 버튼 또는 드래그 앤 드롭으로 삽입할 수 있어요.">${isEdit ? (item.body || '') : ''}</div>
+      </div>
+    </div>
     <div class="edit-actions">
       <button class="btn" onclick="cancelForm('${key}')">취소</button>
       <button class="btn btn-primary" onclick="saveItem('${key}',${idx})">저장</button>
@@ -325,16 +359,97 @@ function initTagInput() {
   });
 }
 
+function initEditor() {
+  const body = document.getElementById('f-body');
+  if (!body) return;
+
+  // 드래그 앤 드롭 이미지
+  body.addEventListener('dragover', e => { e.preventDefault(); body.style.outline = '2px dashed var(--accent)'; });
+  body.addEventListener('dragleave', e => { body.style.outline = ''; });
+  body.addEventListener('drop', e => {
+    e.preventDefault();
+    body.style.outline = '';
+    const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
+    files.forEach(f => insertImageFromFile(f));
+  });
+
+  // 클립보드 붙여넣기 이미지
+  body.addEventListener('paste', e => {
+    const items = [...e.clipboardData.items].filter(i => i.type.startsWith('image/'));
+    if (items.length) {
+      e.preventDefault();
+      items.forEach(i => insertImageFromFile(i.getAsFile()));
+    }
+  });
+}
+
+function edFmt(cmd) {
+  document.getElementById('f-body').focus();
+  document.execCommand(cmd, false, null);
+}
+
+function edCode() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const text = range.toString();
+  if (!text) return;
+  const code = document.createElement('code');
+  code.textContent = text;
+  range.deleteContents();
+  range.insertNode(code);
+  sel.collapseToEnd();
+}
+
+function edHr() {
+  const body = document.getElementById('f-body');
+  body.focus();
+  document.execCommand('insertHTML', false, '<hr>');
+}
+
+function insertImageFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  insertImageFromFile(file);
+  input.value = '';
+}
+
+function insertImageFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const body = document.getElementById('f-body');
+    body.focus();
+    const img = document.createElement('img');
+    img.src = e.target.result;
+    img.style.maxWidth = '100%';
+    const sel = window.getSelection();
+    if (sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      range.collapse(false);
+      range.insertNode(img);
+      range.setStartAfter(img);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      body.appendChild(img);
+    }
+    toast('이미지 삽입 완료!');
+  };
+  reader.readAsDataURL(file);
+}
+
 function saveItem(key, idx) {
   const title = document.getElementById('f-title').value.trim();
   if (!title) { toast('제목을 입력해 주세요'); return; }
+  const bodyEl = document.getElementById('f-body');
   const item = {
     id: idx >= 0 ? data.sections[key].items[idx].id : Date.now(),
     title,
     author: document.getElementById('f-author').value.trim(),
     tags: [...currentTags],
     date: new Date().toLocaleDateString('ko-KR'),
-    body: document.getElementById('f-body').value.trim()
+    body: bodyEl ? bodyEl.innerHTML.trim() : ''
   };
   if (idx >= 0) data.sections[key].items[idx] = item;
   else data.sections[key].items.push(item);
