@@ -78,6 +78,16 @@
   .tag-공통 { background: #2a2a1e; color: #cfcf7a; }
   .tag-중요 { background: #2e1e1e; color: #cf7a7a; }
   .tag-공지 { background: #2e1e1e; color: #cf7a7a; }
+  .hashtag { display: inline-flex; align-items: center; gap: 4px; background: #1e2040; color: #a594f9; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; border: 1px solid #3a3060; }
+  .hashtag .ht-remove { cursor: pointer; color: #7060c0; font-size: 14px; line-height: 1; }
+  .hashtag .ht-remove:hover { color: #cf7a7a; }
+  .hashtag-area { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); min-height: 42px; cursor: text; transition: border-color .15s; }
+  .hashtag-area:focus-within { border-color: var(--border2); }
+  .hashtag-input { border: none; background: transparent; color: var(--text); font-size: 13px; outline: none; min-width: 120px; flex: 1; padding: 2px 0; font-family: inherit; }
+  .hashtag-input::placeholder { color: var(--text3); }
+  .tag-suggestions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+  .tag-suggest-btn { background: transparent; border: 1px solid var(--border); border-radius: 20px; color: var(--text3); font-size: 11px; padding: 2px 9px; cursor: pointer; transition: all .15s; }
+  .tag-suggest-btn:hover { border-color: var(--accent); color: var(--accent2); background: rgba(124,106,247,0.08); }
 
   /* 편집 패널 */
   .edit-panel { background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
@@ -210,38 +220,53 @@ function renderSection(key) {
     <div id="form-${key}"></div>
     <div id="list-${key}">
       ${items.length === 0 ? '<div class="empty">항목이 없어요. 추가해 보세요.</div>'
-        : items.map((item, i) => `
-        <div class="card">
+        : items.map((item, i) => {
+          const tags = Array.isArray(item.tags) ? item.tags : (item.tag ? [item.tag] : []);
+          const tagHTML = tags.map(t => `<span class="hashtag">#${t}</span>`).join('');
+          return `<div class="card">
           <div class="card-info">
-            <div class="card-title">${item.title} <span class="tag tag-${item.tag}">${item.tag}</span></div>
+            <div class="card-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${item.title} ${tagHTML}</div>
             <div class="card-meta">${item.author} · ${item.date}</div>
           </div>
           <div class="card-actions">
             <button class="btn" onclick="showEditForm('${key}',${i})">수정</button>
             <button class="btn btn-danger" onclick="deleteItem('${key}',${i})">삭제</button>
           </div>
-        </div>`).join('')}
+        </div>`;}).join('')}
     </div>`;
 }
 
 function showAddForm(key) {
   document.getElementById('form-' + key).innerHTML = buildEntryForm(key, null, -1);
+  setTimeout(() => initTagInput(), 0);
 }
 
 function showEditForm(key, i) {
   const item = data.sections[key].items[i];
   document.getElementById('form-' + key).innerHTML = buildEntryForm(key, item, i);
+  setTimeout(() => initTagInput(), 0);
   document.getElementById('form-' + key).scrollIntoView({ behavior: 'smooth' });
 }
 
+let currentTags = [];
+
 function buildEntryForm(key, item, idx) {
   const isEdit = idx >= 0;
+  const existingTags = isEdit ? (Array.isArray(item.tags) ? item.tags : (item.tag ? [item.tag] : [])) : [];
+  currentTags = [...existingTags];
+  const SUGGEST = ['프로그래머', '아트', '기획', '공통', '중요', 'Unity', 'UI', '버그', '참고', '필독'];
   return `<div class="edit-panel">
     <div class="edit-panel-title">${isEdit ? '항목 수정' : '새 항목 추가'}</div>
     <div class="form-group"><label>제목</label><input id="f-title" value="${isEdit ? esc(item.title) : ''}"></div>
     <div class="form-group"><label>작성자</label><input id="f-author" value="${isEdit ? esc(item.author) : ''}"></div>
-    <div class="form-group"><label>태그</label>
-      <select id="f-tag">${TAG_OPTIONS.map(t => `<option value="${t}"${isEdit && item.tag===t?' selected':''}>${t}</option>`).join('')}</select>
+    <div class="form-group">
+      <label>해시태그 <span style="color:var(--text3);font-weight:400">— 입력 후 Enter 또는 Space로 추가</span></label>
+      <div class="hashtag-area" id="hashtag-area" onclick="document.getElementById('f-tag-input').focus()">
+        <input class="hashtag-input" id="f-tag-input" placeholder="#태그입력..." autocomplete="off">
+      </div>
+      <div class="tag-suggestions" id="tag-suggestions">
+        ${SUGGEST.map(t => `<button type="button" class="tag-suggest-btn" onclick="addTag('${t}')">#${t}</button>`).join('')}
+      </div>
     </div>
     <div class="form-group"><label>내용</label><textarea id="f-body" rows="5">${isEdit ? esc(item.body) : ''}</textarea></div>
     <div class="edit-actions">
@@ -251,6 +276,55 @@ function buildEntryForm(key, item, idx) {
   </div>`;
 }
 
+function renderTagChips() {
+  const area = document.getElementById('hashtag-area');
+  if (!area) return;
+  const input = document.getElementById('f-tag-input');
+  area.innerHTML = '';
+  currentTags.forEach((t, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'hashtag';
+    chip.innerHTML = `#${t} <span class="ht-remove" onclick="removeTag(${i})">×</span>`;
+    area.appendChild(chip);
+  });
+  area.appendChild(input);
+  input.focus();
+}
+
+function addTag(raw) {
+  const val = raw.replace(/^#+/, '').trim();
+  if (!val || currentTags.includes(val)) return;
+  currentTags.push(val);
+  renderTagChips();
+}
+
+function removeTag(i) {
+  currentTags.splice(i, 1);
+  renderTagChips();
+}
+
+function initTagInput() {
+  const input = document.getElementById('f-tag-input');
+  if (!input) return;
+  renderTagChips();
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const val = input.value.replace(/^#+/, '').trim();
+      if (val) { addTag(val); input.value = ''; }
+    } else if (e.key === 'Backspace' && input.value === '' && currentTags.length > 0) {
+      currentTags.pop();
+      renderTagChips();
+    }
+  });
+  input.addEventListener('input', e => {
+    if (input.value.endsWith(' ')) {
+      const val = input.value.replace(/^#+/, '').trim();
+      if (val) { addTag(val); input.value = ''; }
+    }
+  });
+}
+
 function saveItem(key, idx) {
   const title = document.getElementById('f-title').value.trim();
   if (!title) { toast('제목을 입력해 주세요'); return; }
@@ -258,7 +332,7 @@ function saveItem(key, idx) {
     id: idx >= 0 ? data.sections[key].items[idx].id : Date.now(),
     title,
     author: document.getElementById('f-author').value.trim(),
-    tag: document.getElementById('f-tag').value,
+    tags: [...currentTags],
     date: new Date().toLocaleDateString('ko-KR'),
     body: document.getElementById('f-body').value.trim()
   };

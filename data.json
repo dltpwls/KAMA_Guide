@@ -3,7 +3,12 @@
     "name": "졸업작품 팀 라이브러리",
     "description": "팀 내 공용 문서 및 소통 공간",
     "members": [
-      { "id": 1, "name": "팀원 이름", "role": "프로그래머", "color": "#5B5BD6" }
+      {
+        "id": 1,
+        "name": "팀원 이름",
+        "role": "프로그래머",
+        "color": "#5B5BD6"
+      }
     ]
   },
   "sections": {
@@ -15,9 +20,11 @@
           "id": 1,
           "title": "예시: 오브젝트 풀링 시스템",
           "author": "프로그래머",
-          "tag": "프로그래머",
           "date": "2025-06-01",
-          "body": "ObjectPool.Get<T>() 로 오브젝트를 꺼내고,\nObjectPool.Return(obj) 로 반환합니다.\n\n사용 예시:\nvar bullet = ObjectPool.Get<Bullet>();\nbullet.Fire(direction);\n// 사용 후\nObjectPool.Return(bullet);"
+          "body": "ObjectPool.Get<T>() 로 오브젝트를 꺼내고,\nObjectPool.Return(obj) 로 반환합니다.\n\n사용 예시:\nvar bullet = ObjectPool.Get<Bullet>();\nbullet.Fire(direction);\n// 사용 후\nObjectPool.Return(bullet);",
+          "tags": [
+            "프로그래머"
+          ]
         }
       ]
     },
@@ -29,9 +36,11 @@
           "id": 1,
           "title": "예시: 플레이어 프리팹 세팅",
           "author": "프로그래머",
-          "tag": "공통",
           "date": "2025-06-01",
-          "body": "1. Assets/Prefabs/Player 폴더에서 Player.prefab 선택\n2. Inspector에서 PlayerController 컴포넌트 확인\n3. Speed, JumpForce 값 설정\n4. 씬에 드래그 앤 드롭"
+          "body": "1. Assets/Prefabs/Player 폴더에서 Player.prefab 선택\n2. Inspector에서 PlayerController 컴포넌트 확인\n3. Speed, JumpForce 값 설정\n4. 씬에 드래그 앤 드롭",
+          "tags": [
+            "공통"
+          ]
         }
       ]
     },
@@ -43,9 +52,11 @@
           "id": 1,
           "title": "예시: GitHub 브랜치 규칙",
           "author": "팀장",
-          "tag": "공통",
           "date": "2025-06-01",
-          "body": "main - 최종 빌드만\ndev - 개발 통합 브랜치\nfeature/기능명 - 개인 작업 브랜치\n\nPR은 항상 dev로, 코드 리뷰 1명 이상 필수"
+          "body": "main - 최종 빌드만\ndev - 개발 통합 브랜치\nfeature/기능명 - 개인 작업 브랜치\n\nPR은 항상 dev로, 코드 리뷰 1명 이상 필수",
+          "tags": [
+            "공통"
+          ]
         }
       ]
     }

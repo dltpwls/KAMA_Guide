@@ -89,7 +89,7 @@
 
   .page-header { margin-bottom: 28px; }
   .page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
-  .page-desc { font-size: 13px; color: var(--text3); }
+  .page-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin-top: 6px; }
 
   .search-bar {
     width: 100%;
@@ -248,6 +248,12 @@ function renderAll() {
   renderBoard();
 }
 
+const SECTION_DESC = {
+  engine: '프로그래머가 만든 편의 기능 사용법을 정리해요. 함수 사용법, 주의사항, 예시 코드를 확인할 수 있어요.',
+  prefab: '씬에서 사용하는 프리팹의 세팅 방법과 컴포넌트 설정을 정리해요.',
+  tools: '구글 드라이브, 노션, 깃허브 등 팀 협업 툴 사용 규칙과 방법을 정리해요.'
+};
+
 function renderSection(key) {
   const sec = data.sections[key];
   const el = document.getElementById('page-' + key);
@@ -255,7 +261,8 @@ function renderSection(key) {
   el.innerHTML = `
     <div class="page-header">
       <div class="page-title">${sec.icon} ${sec.label}</div>
-      <div class="page-desc">${items.length}개 항목</div>
+      <div class="page-desc">${SECTION_DESC[key]}</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:6px">${items.length}개 항목</div>
     </div>
     <input class="search-bar" placeholder="검색..." oninput="filterCards('${key}', this.value)" />
     <div id="list-${key}">
@@ -264,12 +271,14 @@ function renderSection(key) {
 }
 
 function renderCard(key, item, i) {
+  const tags = Array.isArray(item.tags) ? item.tags : (item.tag ? [item.tag] : []);
+  const tagHTML = tags.map(t => `<span class="hashtag">#${t}</span>`).join('');
   return `<div class="card" id="card-${key}-${i}">
     <div class="card-head" onclick="toggleCard('${key}',${i})">
       <div class="card-head-left">
         <div class="card-title-row">
           <span class="card-title-text">${item.title}</span>
-          <span class="tag tag-${item.tag}">${item.tag}</span>
+          ${tagHTML}
         </div>
         <div class="card-meta">${item.author} · ${item.date}</div>
       </div>
@@ -290,11 +299,13 @@ function filterCards(key, query) {
   const sec = data.sections[key];
   const q = query.toLowerCase();
   const el = document.getElementById('list-' + key);
-  const filtered = sec.items.filter(item =>
-    item.title.toLowerCase().includes(q) ||
-    item.body.toLowerCase().includes(q) ||
-    item.author.toLowerCase().includes(q)
-  );
+  const filtered = sec.items.filter(item => {
+    const tags = Array.isArray(item.tags) ? item.tags : (item.tag ? [item.tag] : []);
+    return item.title.toLowerCase().includes(q) ||
+      item.body.toLowerCase().includes(q) ||
+      item.author.toLowerCase().includes(q) ||
+      tags.some(t => t.toLowerCase().includes(q.replace(/^#/, '')));
+  });
   el.innerHTML = filtered.length === 0
     ? '<div class="empty">검색 결과가 없어요.</div>'
     : filtered.map((item, i) => renderCard(key, item, i)).join('');
