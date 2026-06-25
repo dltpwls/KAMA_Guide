@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>라이브러리 관리자</title>
+<style>
+  :root {
+    --bg: #0f0f11; --bg2: #17171a; --bg3: #1e1e22;
+    --border: #2a2a30; --border2: #38383f;
+    --text: #e8e8ec; --text2: #9898a8; --text3: #606070;
+    --accent: #7c6af7; --accent2: #a594f9;
+    --danger: #cf4f4f; --success: #4fcf7a;
+    --radius: 10px; --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif; min-height: 100vh; }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0;
+    background: rgba(15,15,17,0.95); backdrop-filter: blur(12px); z-index: 10;
+  }
+  .logo { font-size: 15px; font-weight: 600; }
+  .logo span { color: var(--accent2); }
+  .badge { font-size: 10px; background: var(--danger); color: #fff; padding: 2px 7px; border-radius: 4px; margin-left: 8px; letter-spacing: 0.05em; }
+  .back-link { font-size: 12px; color: var(--text3); text-decoration: none; border: 1px solid var(--border); padding: 5px 12px; border-radius: var(--radius-sm); transition: all .15s; }
+  .back-link:hover { color: var(--text2); border-color: var(--border2); }
+
+  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 56px); }
+  .sidebar { border-right: 1px solid var(--border); padding: 24px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .sidebar-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; padding: 0 20px; margin-bottom: 4px; }
+  .sidebar-btn { width: 100%; padding: 8px 20px; text-align: left; background: transparent; border: none; cursor: pointer; font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 8px; transition: all .1s; border-left: 2px solid transparent; }
+  .sidebar-btn:hover { color: var(--text); background: var(--bg2); }
+  .sidebar-btn.active { color: var(--text); background: var(--bg3); border-left-color: var(--accent); }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 12px 20px; }
+
+  .main { padding: 32px 40px; max-width: 860px; }
+  .page { display: none; } .page.active { display: block; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+
+  /* 버튼 */
+  .btn { padding: 8px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; font-size: 13px; transition: all .15s; }
+  .btn:hover { background: var(--bg3); color: var(--text); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .btn-danger { color: var(--danger); border-color: var(--danger); }
+  .btn-danger:hover { background: rgba(207,79,79,0.1); }
+  .btn-success { background: var(--success); border-color: var(--success); color: #0f0f11; font-weight: 600; }
+  .btn-success:hover { opacity: 0.9; }
+
+  /* 폼 */
+  .form-group { margin-bottom: 14px; }
+  label { display: block; font-size: 12px; color: var(--text3); margin-bottom: 5px; font-weight: 500; letter-spacing: 0.02em; }
+  input, textarea, select {
+    width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text); font-size: 13px; padding: 9px 12px; outline: none; transition: border-color .15s;
+    font-family: inherit;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--border2); }
+  textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+  select option { background: var(--bg2); }
+
+  /* 카드 */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-info { flex: 1; min-width: 0; }
+  .card-title { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+  .card-meta { font-size: 12px; color: var(--text3); }
+  .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+  .tag-프로그래머 { background: #1e2a4a; color: #7aadff; }
+  .tag-아트 { background: #2a1e38; color: #c47aff; }
+  .tag-기획 { background: #1e2e1e; color: #7acf7a; }
+  .tag-공통 { background: #2a2a1e; color: #cfcf7a; }
+  .tag-중요 { background: #2e1e1e; color: #cf7a7a; }
+  .tag-공지 { background: #2e1e1e; color: #cf7a7a; }
+
+  /* 편집 패널 */
+  .edit-panel { background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .edit-panel-title { font-size: 13px; font-weight: 600; color: var(--accent2); margin-bottom: 14px; }
+  .edit-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+
+  /* 내보내기 */
+  .export-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .export-box h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .export-box p { font-size: 12px; color: var(--text3); line-height: 1.7; margin-bottom: 14px; }
+  .export-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .step-list { counter-reset: steps; }
+  .step { display: flex; gap: 12px; margin-bottom: 12px; font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .step::before { counter-increment: steps; content: counter(steps); background: var(--accent); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  code { background: var(--bg); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-family: monospace; color: var(--accent2); }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); padding: 12px 18px; font-size: 13px; color: var(--text); z-index: 999; transform: translateY(60px); opacity: 0; transition: all .3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  .empty { text-align: center; padding: 32px 0; color: var(--text3); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">팀 <span>라이브러리</span> <span class="badge">관리자</span></div>
+  <a class="back-link" href="index.html">← 라이브러리로</a>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-label">문서 관리</div>
+      <button class="sidebar-btn active" onclick="showPage('engine')">⚙️ 엔진 기능</button>
+      <button class="sidebar-btn" onclick="showPage('prefab')">📦 프리팹 세팅</button>
+      <button class="sidebar-btn" onclick="showPage('tools')">🛠️ 협업 툴</button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div>
+      <div class="sidebar-label">소통 관리</div>
+      <button class="sidebar-btn" onclick="showPage('board')">💬 팀원 공간</button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div>
+      <div class="sidebar-label">배포</div>
+      <button class="sidebar-btn" onclick="showPage('export')">📤 내보내기</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div id="page-engine" class="page active"></div>
+    <div id="page-prefab" class="page"></div>
+    <div id="page-tools" class="page"></div>
+    <div id="page-board" class="page"></div>
+    <div id="page-export" class="page">
+      <div class="page-header"><div class="page-title">📤 내보내기 & 배포</div></div>
+      <div class="export-box">
+        <h3>1단계 — data.json 다운로드</h3>
+        <p>수정한 내용을 data.json 파일로 저장하세요.<br>이 파일을 GitHub 리포지토리에 올리면 라이브러리에 자동 반영됩니다.</p>
+        <div class="export-actions">
+          <button class="btn btn-success" onclick="downloadJSON()">⬇ data.json 다운로드</button>
+        </div>
+      </div>
+      <div class="export-box">
+        <h3>2단계 — GitHub에 올리기</h3>
+        <div class="step-list">
+          <div class="step">GitHub 리포지토리에서 <code>data.json</code> 파일을 클릭</div>
+          <div class="step">연필 아이콘(편집) 클릭 → 기존 내용 전체 선택 후 삭제</div>
+          <div class="step">다운로드한 파일 내용을 붙여넣기</div>
+          <div class="step"><code>Commit changes</code> 버튼 클릭 → 완료!</div>
+        </div>
+      </div>
+      <div class="export-box">
+        <h3>처음 GitHub Pages 설정하는 방법</h3>
+        <div class="step-list">
+          <div class="step">GitHub에서 새 리포지토리 생성 (Public으로 설정)</div>
+          <div class="step"><code>index.html</code>, <code>admin.html</code>, <code>data.json</code> 3개 파일 업로드</div>
+          <div class="step">리포지토리 → Settings → Pages → Branch: <code>main</code> 선택 → Save</div>
+          <div class="step">몇 분 후 <code>https://유저명.github.io/리포명</code> 으로 접속 가능</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TAG_OPTIONS = ['프로그래머', '아트', '기획', '공통', '중요'];
+const POST_TAGS = ['공지', '공통', '중요'];
+
+let data = null;
+let editing = null;
+
+async function loadData() {
+  try {
+    const res = await fetch('./data.json?t=' + Date.now());
+    data = await res.json();
+  } catch(e) {
+    data = {
+      team: { name: "팀 라이브러리", members: [] },
+      sections: {
+        engine: { label: "엔진 기능", icon: "⚙️", items: [] },
+        prefab: { label: "프리팹 세팅", icon: "📦", items: [] },
+        tools: { label: "협업 툴", icon: "🛠️", items: [] }
+      },
+      board: { posts: [] }
+    };
+  }
+  renderAll();
+}
+
+function renderAll() {
+  renderSection('engine');
+  renderSection('prefab');
+  renderSection('tools');
+  renderBoard();
+}
+
+function renderSection(key) {
+  const sec = data.sections[key];
+  const el = document.getElementById('page-' + key);
+  const items = sec.items || [];
+  el.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">${sec.icon} ${sec.label}</div>
+      <button class="btn btn-primary" onclick="showAddForm('${key}')">+ 항목 추가</button>
+    </div>
+    <div id="form-${key}"></div>
+    <div id="list-${key}">
+      ${items.length === 0 ? '<div class="empty">항목이 없어요. 추가해 보세요.</div>'
+        : items.map((item, i) => `
+        <div class="card">
+          <div class="card-info">
+            <div class="card-title">${item.title} <span class="tag tag-${item.tag}">${item.tag}</span></div>
+            <div class="card-meta">${item.author} · ${item.date}</div>
+          </div>
+          <div class="card-actions">
+            <button class="btn" onclick="showEditForm('${key}',${i})">수정</button>
+            <button class="btn btn-danger" onclick="deleteItem('${key}',${i})">삭제</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function showAddForm(key) {
+  document.getElementById('form-' + key).innerHTML = buildEntryForm(key, null, -1);
+}
+
+function showEditForm(key, i) {
+  const item = data.sections[key].items[i];
+  document.getElementById('form-' + key).innerHTML = buildEntryForm(key, item, i);
+  document.getElementById('form-' + key).scrollIntoView({ behavior: 'smooth' });
+}
+
+function buildEntryForm(key, item, idx) {
+  const isEdit = idx >= 0;
+  return `<div class="edit-panel">
+    <div class="edit-panel-title">${isEdit ? '항목 수정' : '새 항목 추가'}</div>
+    <div class="form-group"><label>제목</label><input id="f-title" value="${isEdit ? esc(item.title) : ''}"></div>
+    <div class="form-group"><label>작성자</label><input id="f-author" value="${isEdit ? esc(item.author) : ''}"></div>
+    <div class="form-group"><label>태그</label>
+      <select id="f-tag">${TAG_OPTIONS.map(t => `<option value="${t}"${isEdit && item.tag===t?' selected':''}>${t}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>내용</label><textarea id="f-body" rows="5">${isEdit ? esc(item.body) : ''}</textarea></div>
+    <div class="edit-actions">
+      <button class="btn" onclick="cancelForm('${key}')">취소</button>
+      <button class="btn btn-primary" onclick="saveItem('${key}',${idx})">저장</button>
+    </div>
+  </div>`;
+}
+
+function saveItem(key, idx) {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { toast('제목을 입력해 주세요'); return; }
+  const item = {
+    id: idx >= 0 ? data.sections[key].items[idx].id : Date.now(),
+    title,
+    author: document.getElementById('f-author').value.trim(),
+    tag: document.getElementById('f-tag').value,
+    date: new Date().toLocaleDateString('ko-KR'),
+    body: document.getElementById('f-body').value.trim()
+  };
+  if (idx >= 0) data.sections[key].items[idx] = item;
+  else data.sections[key].items.push(item);
+  cancelForm(key);
+  renderSection(key);
+  toast(idx >= 0 ? '수정 완료!' : '추가 완료!');
+}
+
+function deleteItem(key, i) {
+  if (!confirm('삭제할까요?')) return;
+  data.sections[key].items.splice(i, 1);
+  renderSection(key);
+  toast('삭제 완료');
+}
+
+function cancelForm(key) { document.getElementById('form-' + key).innerHTML = ''; }
+
+function renderBoard() {
+  const el = document.getElementById('page-board');
+  const posts = (data.board && data.board.posts) || [];
+  el.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">💬 팀원 공간</div>
+      <button class="btn btn-primary" onclick="showAddPost()">+ 글 추가</button>
+    </div>
+    <div id="form-board"></div>
+    <div id="list-board">
+      ${posts.length === 0 ? '<div class="empty">게시물이 없어요.</div>'
+        : posts.slice().reverse().map((p, ri) => {
+          const i = posts.length - 1 - ri;
+          return `<div class="card">
+            <div class="card-info">
+              <div class="card-title">${p.title} ${p.tag ? `<span class="tag tag-${p.tag}">${p.tag}</span>` : ''}</div>
+              <div class="card-meta">${p.author} · ${p.date}</div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-danger" onclick="deletePost(${i})">삭제</button>
+            </div>
+          </div>`;
+        }).join('')}
+    </div>`;
+}
+
+function showAddPost() {
+  const members = (data.team && data.team.members) || [];
+  document.getElementById('form-board').innerHTML = `<div class="edit-panel">
+    <div class="edit-panel-title">새 글 추가</div>
+    <div class="form-group"><label>작성자</label>
+      ${members.length > 0
+        ? `<select id="f-pauthor">${members.map(m=>`<option value="${m.name}" data-color="${m.color}">${m.name} (${m.role})</option>`).join('')}</select>`
+        : `<input id="f-pauthor" placeholder="이름">`}
+    </div>
+    <div class="form-group"><label>태그</label>
+      <select id="f-ptag"><option value="">없음</option>${POST_TAGS.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>제목</label><input id="f-ptitle"></div>
+    <div class="form-group"><label>내용</label><textarea id="f-pbody" rows="4"></textarea></div>
+    <div class="edit-actions">
+      <button class="btn" onclick="document.getElementById('form-board').innerHTML=''">취소</button>
+      <button class="btn btn-primary" onclick="savePost()">게시</button>
+    </div>
+  </div>`;
+}
+
+function savePost() {
+  const title = document.getElementById('f-ptitle').value.trim();
+  if (!title) { toast('제목을 입력해 주세요'); return; }
+  const authorEl = document.getElementById('f-pauthor');
+  const authorColor = authorEl.tagName === 'SELECT'
+    ? (authorEl.options[authorEl.selectedIndex].dataset.color || '#7c6af7')
+    : '#7c6af7';
+  const post = {
+    id: Date.now(),
+    author: authorEl.value.trim(),
+    authorColor,
+    tag: document.getElementById('f-ptag').value,
+    title,
+    body: document.getElementById('f-pbody').value.trim(),
+    date: new Date().toLocaleDateString('ko-KR')
+  };
+  if (!data.board) data.board = { posts: [] };
+  data.board.posts.push(post);
+  renderBoard();
+  toast('게시 완료!');
+}
+
+function deletePost(i) {
+  if (!confirm('삭제할까요?')) return;
+  data.board.posts.splice(i, 1);
+  renderBoard();
+  toast('삭제 완료');
+}
+
+function downloadJSON() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.json';
+  a.click();
+  toast('다운로드 완료! GitHub에 올려주세요 🚀');
+}
+
+function showPage(key) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + key).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function esc(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+loadData();
+</script>
+</body>
+</html>
