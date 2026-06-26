@@ -123,6 +123,13 @@
   .new-tab-form input { flex: 1; min-width: 120px; }
   .new-tab-form select { width: 90px; flex-shrink: 0; }
 
+  /* 탭 인라인 수정 */
+  .tab-edit-form { background: var(--bg); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 6px; margin-bottom: 6px; display: flex; flex-direction: column; gap: 8px; }
+  .tab-edit-form .tab-edit-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .tab-edit-form .tab-edit-row input { flex: 1; min-width: 100px; }
+  .tab-edit-form .tab-edit-row input.icon-input { width: 70px; flex: none; }
+  .tab-edit-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
   /* 내보내기 */
   .export-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; }
   .export-box h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
@@ -349,15 +356,19 @@ function renderTabManage() {
 
   function rowHTML(key, type) {
     const sec = data.sections[key]; if (!sec) return '';
-    return `<div class="tab-row" id="tabrow-${key}">
-      <span class="tab-row-icon">${sec.icon}</span>
-      <span class="tab-row-label">${sec.label}</span>
-      <span class="tab-row-type">${type === 'pinned' ? '필독' : '문서'}</span>
-      <div class="tab-row-actions">
-        <button class="btn btn-sm" onclick="moveTab('${key}','${type}',-1)" title="위로">↑</button>
-        <button class="btn btn-sm" onclick="moveTab('${key}','${type}',1)" title="아래로">↓</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteTab('${key}','${type}')">삭제</button>
+    return `<div id="tabrow-wrap-${key}">
+      <div class="tab-row" id="tabrow-${key}">
+        <span class="tab-row-icon">${sec.icon}</span>
+        <span class="tab-row-label">${sec.label}</span>
+        <span class="tab-row-type">${type === 'pinned' ? '필독' : '문서'}</span>
+        <div class="tab-row-actions">
+          <button class="btn btn-sm" onclick="moveTab('${key}','${type}',-1)" title="위로">↑</button>
+          <button class="btn btn-sm" onclick="moveTab('${key}','${type}',1)" title="아래로">↓</button>
+          <button class="btn btn-sm" onclick="showTabEditForm('${key}','${type}')">수정</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteTab('${key}','${type}')">삭제</button>
+        </div>
       </div>
+      <div id="tab-edit-form-${key}" style="display:none"></div>
     </div>`;
   }
 
@@ -405,6 +416,58 @@ function deleteTab(key, type) {
   buildAdminUI();
   showAdminPage('tab-manage');
   toast('탭 삭제 완료');
+}
+
+function showTabEditForm(key, type) {
+  // 다른 열려있는 수정 폼 모두 닫기
+  document.querySelectorAll('[id^="tab-edit-form-"]').forEach(el => {
+    if (el.id !== 'tab-edit-form-' + key) { el.style.display = 'none'; el.innerHTML = ''; }
+  });
+
+  const formEl = document.getElementById('tab-edit-form-' + key);
+  if (!formEl) return;
+
+  // 토글: 이미 열려 있으면 닫기
+  if (formEl.style.display !== 'none' && formEl.innerHTML !== '') {
+    formEl.style.display = 'none'; formEl.innerHTML = ''; return;
+  }
+
+  const sec = data.sections[key];
+  formEl.innerHTML = `
+    <div class="tab-edit-form">
+      <div style="font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:2px">탭 정보 수정</div>
+      <div class="tab-edit-row">
+        <input class="icon-input" id="tedit-icon-${key}" value="${esc(sec.icon)}" placeholder="아이콘">
+        <input id="tedit-label-${key}" value="${esc(sec.label)}" placeholder="탭 이름">
+      </div>
+      <div class="tab-edit-row">
+        <input id="tedit-desc-${key}" value="${esc(sec.desc || '')}" placeholder="탭 설명 (선택)">
+      </div>
+      <div class="tab-edit-actions">
+        <button class="btn btn-sm" onclick="closeTabEditForm('${key}')">취소</button>
+        <button class="btn btn-sm btn-primary" onclick="saveTabEdit('${key}','${type}')">저장</button>
+      </div>
+    </div>`;
+  formEl.style.display = 'block';
+  document.getElementById('tedit-label-' + key)?.focus();
+}
+
+function closeTabEditForm(key) {
+  const el = document.getElementById('tab-edit-form-' + key);
+  if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+}
+
+function saveTabEdit(key, type) {
+  const label = document.getElementById('tedit-label-' + key)?.value.trim();
+  if (!label) { toast('탭 이름을 입력해 주세요'); return; }
+  const icon = document.getElementById('tedit-icon-' + key)?.value.trim() || (type === 'pinned' ? '📌' : '📁');
+  const desc = document.getElementById('tedit-desc-' + key)?.value.trim() || '';
+  data.sections[key].label = label;
+  data.sections[key].icon = icon;
+  data.sections[key].desc = desc;
+  buildAdminUI();
+  showAdminPage('tab-manage');
+  toast(`"${label}" 탭 수정 완료!`);
 }
 
 /* ── 섹션 항목 렌더 ── */
