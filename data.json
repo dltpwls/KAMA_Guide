@@ -348,6 +348,123 @@
           "body": "<h2>&nbsp;AE_VFX Player</h2><p class=\"isSelectedEnd\">어빌리티 실행 중 이펙트를 재생하는 컴포넌트입니다.</p><p class=\"isSelectedEnd\"><code dir=\"ltr\">AE_VFX Player</code>는 반드시 <code dir=\"ltr\">VFX Pool</code> 컴포넌트와 함께 사용해야 합니다.</p><h3><br></h3><h3>기본 설정 방법</h3><ol data-spread=\"false\" start=\"1\"><li>같은 오브젝트 또는 VFX 그룹에 <code dir=\"ltr\">VFX Pool</code>을 추가합니다.</li><li><code dir=\"ltr\">VFX Pool</code>에 재생할 이펙트 프리팹을 등록합니다.</li><li>등록한 이펙트에 사용할 이름을 지정합니다.</li><li><code dir=\"ltr\">AE_VFX Player</code>에서 재생할 이펙트의 이름을 입력합니다.</li><li>원하는 이벤트에 재생 함수를 할당합니다.</li></ol><p class=\"isSelectedEnd\"><code dir=\"ltr\">VFX Pool</code>에 등록한 이름과 <code dir=\"ltr\">AE_VFX Player</code>에 입력한 이름이 일치해야 정상적으로 재생됩니다.</p><h3><br></h3><h3>재생 함수 명칭</h3><p class=\"isSelectedEnd\">이벤트에 함수를 할당하면 다양한 재생 함수가 표시됩니다.</p><p class=\"isSelectedEnd\">함수 이름에 포함된 단어는 다음과 같은 의미를 가집니다.</p><h4><br></h4><h4>Position</h4><p class=\"isSelectedEnd\">이벤트가 발생한 시점의 위치를 기준으로 이펙트를 재생합니다.</p><h4><br></h4><h4>Ability Direction</h4><p class=\"isSelectedEnd\">어빌리티가 진행되는 방향을 기준으로 이펙트 방향을 설정합니다.</p><h4><br></h4><h4>Rotation</h4><p class=\"isSelectedEnd\">이벤트가 발생한 시점의 회전값을 기준으로 이펙트를 재생합니다.</p><h4><br></h4><h4>DeAttach</h4><p class=\"isSelectedEnd\">이펙트를 재생한 뒤 캐릭터 또는 기준 오브젝트를 따라가지 않도록 분리합니다.</p><h3><br></h3><h3>예시</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">PlayVFXPositionRotationDeAttach</code>를 사용하면 이펙트가 재생되는 순간의 위치와 회전값을 기준으로 생성됩니다.</p><p>생성된 이후에는 플레이어 캐릭터가 이동하거나 회전해도 이펙트가 플레이어를 따라가지 않습니다.</p>"
         }
       ]
+    },
+    "custom_1782879497270": {
+      "label": "PC 어빌리티 데이터",
+      "icon": "🗡️",
+      "desc": "플레이어 캐릭터의 어빌리티 데이터에 대해 설명하는 탭 입니다.",
+      "items": [
+        {
+          "id": 1782879560416,
+          "title": "1. Air Normal Attack",
+          "author": "박찬만",
+          "tags": [
+            "기획",
+            "Unity",
+            "참고",
+            "공중공격",
+            "낙공",
+            "기본공격",
+            "낙하공격"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>Air Normal Attack</h2><h3>데이터 위치</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">Assets/Resources/01. Data/02. Player/Ability/Air Normal Attack.asset</code></p><p class=\"isSelectedEnd\">공중에서 사용하는 낙하 공격의 이동 관련 값을 설정하는 데이터입니다.</p><h3><br></h3><h3>공격 대시 거리</h3><p class=\"isSelectedEnd\">낙하 공격을 실행하는 동안 플레이어가 이동하는 거리를 의미합니다.</p><h3><br></h3><h3>공격 대시 시간</h3><p class=\"isSelectedEnd\">설정한 공격 대시 거리만큼 이동하는 데 걸리는 시간을 의미합니다.</p><h3><br></h3><h3>설정 예시</h3><ul data-spread=\"false\"><li>공격 대시 거리: <code dir=\"ltr\">3</code></li><li>공격 대시 시간: <code dir=\"ltr\">2초</code></li></ul><p class=\"isSelectedEnd\">위와 같이 설정하면 플레이어가 낙하 공격을 실행하면서 <code dir=\"ltr\">3</code>만큼의 거리를 <code dir=\"ltr\">2초</code> 동안 이동합니다.</p><h3><br></h3><h3>기본 공격 적중 쿨타임 반환</h3><p class=\"isSelectedEnd\">현재 사용하지 않는 변수입니다.</p><p class=\"isSelectedEnd\">해당 값을 수정해도 어빌리티의 쿨타임에 적용되지 않습니다.</p><p>쿨타임을 조절해야 하는 경우에는 데이터가 아닌 해당 어빌리티 프리팹의 <code dir=\"ltr\">AE_CoolTime</code> 컴포넌트를 수정합니다.</p>"
+        },
+        {
+          "id": 1782879606040,
+          "title": "2. Arrive",
+          "author": "박찬만",
+          "tags": [
+            "기획",
+            "Unity",
+            "참고",
+            "도착",
+            "어라이브",
+            "돌파이동",
+            "돌파찌르기",
+            "우클릭"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>Arrive</h2><h3>데이터 위치</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">Assets/Resources/01. Data/02. Player/Ability/Arrive.asset</code></p><p class=\"isSelectedEnd\"><code dir=\"ltr\">Arrive</code>는 <code dir=\"ltr\">Fire Hook</code>이 몬스터에게 적중한 뒤, 플레이어가 대상에게 도착하여 무기를 걸고 있는 상태를 의미합니다.</p><h3><br></h3><h3>조정 가능한 데이터</h3><p class=\"isSelectedEnd\">현재 해당 데이터에서 별도로 조정할 수 있는 값은 없습니다.</p><p><code dir=\"ltr\">Arrive</code> 상태의 지속 시간을 변경하려면 <code dir=\"ltr\">Arrive.asset</code>이 아닌, 해당 어빌리티 프리팹에 있는 <code dir=\"ltr\">AE_TimeScaler</code> 컴포넌트의 지속 시간을 수정해야 합니다.</p>"
+        },
+        {
+          "id": 1782879645294,
+          "title": "3. Fire Hook",
+          "author": "박찬만",
+          "tags": [
+            "기획",
+            "Unity",
+            "참고",
+            "파이어훅",
+            "빠이어훅",
+            "우클릭",
+            "돌파찌르기",
+            "돌파발사"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>Fire Hook</h2><h3>데이터 위치</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">Assets/Resources/01. Data/02. Player/Ability/Fire Hook.asset</code></p><p class=\"isSelectedEnd\">갈고리 투사체의 발사 속도와 최대 이동 거리를 설정하는 데이터입니다.</p><h3><br></h3><h3>발사 시간</h3><p class=\"isSelectedEnd\">갈고리 투사체가 발사된 뒤 설정한 거리까지 이동하는 데 걸리는 시간을 의미합니다.</p><h3><br></h3><h3>발사 거리</h3><p class=\"isSelectedEnd\">갈고리 투사체가 이동할 수 있는 최대 거리를 의미합니다.</p><h3><br></h3><h3>설정 예시</h3><ul data-spread=\"false\"><li>발사 시간: <code dir=\"ltr\">0.2초</code></li><li>발사 거리: <code dir=\"ltr\">11</code></li></ul><p class=\"isSelectedEnd\">위와 같이 설정하면 갈고리 투사체가 최대 <code dir=\"ltr\">11</code>의 거리를 <code dir=\"ltr\">0.2초</code> 동안 이동합니다.</p><p>발사 거리는 같고 발사 시간이 짧아질수록 투사체가 더 빠르게 이동합니다.</p>"
+        },
+        {
+          "id": 1782879730254,
+          "title": "4. Kick Out (Rebound/Smite)",
+          "author": "박찬만",
+          "tags": [
+            "기획",
+            "Unity",
+            "참고",
+            "리바운드",
+            "강타"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>Kick Out</h2><h3>데이터 위치</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">Assets/Resources/01. Data/02. Player/Ability/Kick Out.asset</code></p><p class=\"isSelectedEnd\">해당 데이터는 <code dir=\"ltr\">Rebound</code>와 <code dir=\"ltr\">Smite</code>가 함께 사용하는 공통 데이터입니다.</p><p class=\"isSelectedEnd\">두 어빌리티의 값이 하나의 데이터에 포함되어 있으므로 수정 시 영향을 받는 어빌리티를 반드시 확인해야 합니다.</p><h3><br></h3><h3>액션 구분</h3><ul data-spread=\"false\"><li>정방향 액션: <code dir=\"ltr\">Smite</code></li><li>역방향 액션: <code dir=\"ltr\">Rebound</code></li></ul><div contenteditable=\"false\"><hr></div><h3>플레이어 이동 관련 값</h3><h4><br></h4><h4>상승량</h4><p class=\"isSelectedEnd\">어빌리티 실행 시 플레이어가 이동하는 높이를 의미합니다.</p><h4><br></h4><h4>반동량</h4><p class=\"isSelectedEnd\">플레이어를 밀어내는 힘 또는 이동 속도를 의미합니다.</p><h4><br></h4><h4>반동 지속 시간</h4><p class=\"isSelectedEnd\">설정한 반동량이 적용되는 시간을 의미합니다.</p><h3><br></h3><h3>설정 예시</h3><ul data-spread=\"false\"><li>상승량: <code dir=\"ltr\">10</code></li><li>반동량: <code dir=\"ltr\">10</code></li><li>반동 지속 시간: <code dir=\"ltr\">0.2초</code></li></ul><p class=\"isSelectedEnd\">위와 같이 설정하면 플레이어가 마우스 포인터 방향을 기준으로 <code dir=\"ltr\">10</code>만큼 상승하며, <code dir=\"ltr\">10</code>의 반동량으로 <code dir=\"ltr\">0.2초</code> 동안 이동합니다.</p><div contenteditable=\"false\"><hr></div><h3>몬스터 이동 관련 값</h3><h4><br></h4><h4>몬스터 반동량</h4><p class=\"isSelectedEnd\">어빌리티에 적중한 몬스터가 밀려나는 힘 또는 속도를 의미합니다.</p><h4><br></h4><h4>몬스터 반동 지속 시간</h4><p class=\"isSelectedEnd\">설정한 몬스터 반동량이 적용되는 시간을 의미합니다.</p><p>플레이어의 반동과 유사하게 작동하지만, 몬스터는 상하 이동을 사용하지 않으므로 별도의 상승량 없이 반동량만 적용됩니다.</p>"
+        },
+        {
+          "id": 1782879766525,
+          "title": "5. Landing",
+          "author": "박찬만",
+          "tags": [
+            "기획",
+            "Unity",
+            "참고",
+            "랜딩",
+            "착지",
+            "발톱"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>Landing</h2><h3>데이터 위치</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">Assets/Resources/01. Data/02. Player/Ability/Landing.asset</code></p><p class=\"isSelectedEnd\"><code dir=\"ltr\">Landing</code>은 <code dir=\"ltr\">Rebound</code> 사용 후 플레이어가 지면에 착지했을 때 적용되는 상태입니다.</p><h3><br></h3><h3>밀림 속도</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">Rebound</code> 이후 별도의 이동 입력 없이 지면에 착지했을 때 플레이어가 밀려나는 속도를 의미합니다.</p><h3><br></h3><h3>밀림 시간</h3><p class=\"isSelectedEnd\">설정한 밀림 속도가 유지되는 시간을 의미합니다.</p><h3><br></h3><h3>설정 예시</h3><ul data-spread=\"false\"><li>밀림 속도: <code dir=\"ltr\">1.25</code></li><li>밀림 시간: <code dir=\"ltr\">0.15초</code></li></ul><p>위와 같이 설정하면 플레이어가 착지한 뒤 <code dir=\"ltr\">1.25</code>의 속도로 <code dir=\"ltr\">0.15초</code> 동안 이동합니다.</p>"
+        },
+        {
+          "id": 1782879821887,
+          "title": "6. Normal Attack",
+          "author": "박찬만",
+          "tags": [
+            "기획",
+            "Unity",
+            "참고",
+            "기본공격",
+            "노멀어택",
+            "좌클릭",
+            "공격"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>Normal Attack</h2><h3>데이터 위치</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">Assets/Resources/01. Data/02. Player/Ability/Normal Attack.asset</code></p><p class=\"isSelectedEnd\">지상 기본 공격을 실행할 때 발생하는 플레이어의 이동 값을 설정하는 데이터입니다.</p><h3><br></h3><h3>공격 대시 거리</h3><p class=\"isSelectedEnd\">기본 공격을 실행하는 동안 플레이어가 이동하는 거리를 의미합니다.</p><h3><br></h3><h3>공격 대시 시간</h3><p class=\"isSelectedEnd\">설정한 공격 대시 거리만큼 이동하는 데 걸리는 시간을 의미합니다.</p><h3><br></h3><h3>설정 예시</h3><ul data-spread=\"false\"><li>공격 대시 거리: <code dir=\"ltr\">3</code></li><li>공격 대시 시간: <code dir=\"ltr\">2초</code></li></ul><p class=\"isSelectedEnd\">위와 같이 설정하면 플레이어가 기본 공격을 실행하면서 <code dir=\"ltr\">3</code>만큼의 거리를 <code dir=\"ltr\">2초</code> 동안 이동합니다.</p><h3><br></h3><h3>기본 공격 적중 쿨타임 반환</h3><p class=\"isSelectedEnd\">현재 사용하지 않는 변수입니다.</p><p class=\"isSelectedEnd\">해당 값을 수정해도 어빌리티의 쿨타임에 적용되지 않습니다.</p><p class=\"isSelectedEnd\">쿨타임을 조절해야 하는 경우에는 데이터가 아닌 해당 어빌리티 프리팹의 <code dir=\"ltr\">AE_CoolTime</code> 컴포넌트를 수정합니다.</p><div contenteditable=\"false\"><hr></div><h2></h2>"
+        },
+        {
+          "id": 1782879858038,
+          "title": "7. Rope Fly",
+          "author": "박찬만",
+          "tags": [
+            "기획",
+            "Unity",
+            "참고",
+            "우클릭",
+            "돌파찌르기",
+            "돌파이동"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>Rope Fly</h2><h3>데이터 위치</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">Assets/Resources/01. Data/02. Player/Ability/Rope Fly.asset</code></p><p class=\"isSelectedEnd\"><code dir=\"ltr\">Rope Fly</code>는 <code dir=\"ltr\">Fire Hook</code>이 대상에게 적중한 뒤, 플레이어가 적중 대상을 향해 이동하는 행동을 담당하는 어빌리티입니다.</p><h3><br></h3><h3>비행 속도</h3><p class=\"isSelectedEnd\">플레이어가 <code dir=\"ltr\">Fire Hook</code>에 적중한 대상을 향해 이동하는 속도를 의미합니다.</p><h3><br></h3><h3>비행 종료 반경</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">Fire Hook</code>이 적중한 대상을 중심으로 설정되는 원형 반경을 의미합니다.</p><p class=\"isSelectedEnd\">플레이어가 해당 반경 안에 도달하면 <code dir=\"ltr\">Rope Fly</code> 이동이 종료되고 <code dir=\"ltr\">Arrive</code> 상태로 전환됩니다.</p><p>비행 종료 반경을 크게 설정하면 플레이어가 대상에게서 비교적 먼 위치에서 멈추며, 작게 설정하면 대상에게 더 가까이 접근한 뒤 <code dir=\"ltr\">Arrive</code> 상태로 전환됩니다.</p>"
+        }
+      ]
     }
   },
   "board": {
@@ -384,7 +501,8 @@
           "tools",
           "custom_1782819756828",
           "custom_1782871213933",
-          "custom_1782872569574"
+          "custom_1782872569574",
+          "custom_1782879497270"
         ]
       }
     ]
