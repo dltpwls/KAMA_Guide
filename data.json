@@ -172,16 +172,27 @@
     ]
   },
   "tabs": {
-    "pinned_order": [
-      "pinned",
-      "setup"
-    ],
-    "doc_order": [
-      "engine",
-      "prefab",
-      "tools",
-      "custom_1782819756828"
-    ],
-    "custom_sections": {}
+    "groups": [
+      {
+        "id": "g_pinned",
+        "icon": "📌",
+        "label": "필독",
+        "order": [
+          "pinned",
+          "setup"
+        ]
+      },
+      {
+        "id": "g_doc",
+        "icon": "📁",
+        "label": "문서",
+        "order": [
+          "engine",
+          "prefab",
+          "tools",
+          "custom_1782819756828"
+        ]
+      }
+    ]
   }
 }

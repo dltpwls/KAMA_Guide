@@ -22,7 +22,7 @@
   .admin-link { font-size: 12px; color: var(--text3); text-decoration: none; border: 1px solid var(--border); padding: 5px 12px; border-radius: var(--radius-sm); transition: all .15s; }
   .admin-link:hover { color: var(--text2); border-color: var(--border2); }
 
-  .layout { display: grid; grid-template-columns: 210px 1fr; min-height: calc(100vh - 56px); }
+  .layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 56px); }
 
   .sidebar { border-right: 1px solid var(--border); padding: 20px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
   .sidebar-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; padding: 0 20px; margin-bottom: 4px; margin-top: 12px; }
@@ -131,44 +131,40 @@ async function loadData() {
   }
 }
 
-function getSectionOrder() {
+function getGroups() {
   const tabs = data.tabs || {};
+  if (Array.isArray(tabs.groups)) return tabs.groups;
+  // 구버전 호환: pinned_order/doc_order만 있는 경우
+  const groups = [];
   const pinnedOrder = tabs.pinned_order || ['pinned', 'setup'];
   const docOrder = tabs.doc_order || ['engine', 'prefab', 'tools'];
-  return { pinnedOrder, docOrder };
+  if (pinnedOrder.length) groups.push({ id: 'g_pinned', icon: '📌', label: '필독', order: pinnedOrder });
+  if (docOrder.length) groups.push({ id: 'g_doc', icon: '📁', label: '문서', order: docOrder });
+  return groups;
 }
 
 function buildUI() {
-  const { pinnedOrder, docOrder } = getSectionOrder();
+  const groups = getGroups();
   const sidebar = document.getElementById('sidebar');
   const main = document.getElementById('main-area');
 
   let sidebarHTML = '';
   let mainHTML = '';
+  let allKeys = [];
 
-  // 필독 그룹
-  if (pinnedOrder.length > 0) {
-    sidebarHTML += `<div class="sidebar-label">필독</div>`;
-    pinnedOrder.forEach(key => {
+  groups.forEach(group => {
+    if (!group.order || !group.order.length) return;
+    sidebarHTML += `<div class="sidebar-label">${group.icon || ''} ${group.label}</div>`;
+    group.order.forEach(key => {
       const sec = data.sections[key];
       if (!sec) return;
-      sidebarHTML += `<button class="sidebar-btn pinned-btn" id="nav-${key}" onclick="showPage('${key}')">${sec.icon} ${sec.label}</button>`;
+      const pinnedClass = sec.pinned ? ' pinned-btn' : '';
+      sidebarHTML += `<button class="sidebar-btn${pinnedClass}" id="nav-${key}" onclick="showPage('${key}')">${sec.icon} ${sec.label}</button>`;
       mainHTML += `<div id="page-${key}" class="page"></div>`;
+      allKeys.push(key);
     });
     sidebarHTML += `<div class="sidebar-divider"></div>`;
-  }
-
-  // 문서 그룹
-  if (docOrder.length > 0) {
-    sidebarHTML += `<div class="sidebar-label">문서</div>`;
-    docOrder.forEach(key => {
-      const sec = data.sections[key];
-      if (!sec) return;
-      sidebarHTML += `<button class="sidebar-btn" id="nav-${key}" onclick="showPage('${key}')">${sec.icon} ${sec.label}</button>`;
-      mainHTML += `<div id="page-${key}" class="page"></div>`;
-    });
-    sidebarHTML += `<div class="sidebar-divider"></div>`;
-  }
+  });
 
   // 소통 (board 고정)
   sidebarHTML += `<div class="sidebar-label">소통</div>`;
@@ -179,13 +175,13 @@ function buildUI() {
   main.innerHTML = mainHTML;
 
   // 각 섹션 렌더
-  [...pinnedOrder, ...docOrder].forEach(key => {
+  allKeys.forEach(key => {
     if (data.sections[key]) renderSection(key);
   });
   renderBoard();
 
   // 첫 탭 활성화
-  const firstKey = pinnedOrder[0] || docOrder[0] || 'board';
+  const firstKey = allKeys[0] || 'board';
   const firstBtn = document.getElementById('nav-' + firstKey);
   if (firstBtn) { firstBtn.classList.add('active'); }
   const firstPage = document.getElementById('page-' + firstKey);
