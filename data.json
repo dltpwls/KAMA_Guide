@@ -237,6 +237,117 @@
           "body": "<h2>Lens Distortion (Lens)</h2><p class=\"isSelectedEnd\">화면에 볼록렌즈 또는 오목렌즈 형태의 왜곡을 적용할 때 사용합니다.</p><h3>사용 방법</h3><ol data-spread=\"false\" start=\"1\"><li>원하는 이벤트에 <code dir=\"ltr\">VCC Trigger_Lens Distortion</code> 컴포넌트를 할당합니다.</li><li><code dir=\"ltr\">SetIntensity(Float)</code>에 원하는 값을 입력합니다.</li><li>이벤트가 실행되면 설정한 값에 따라 화면 왜곡이 적용됩니다.</li></ol><p class=\"isSelectedEnd\"><code dir=\"ltr\">Intensity</code> 값은 <code dir=\"ltr\">0</code>을 기준으로 효과의 방향이 달라집니다.</p><ul data-spread=\"false\"><li>음수 값: 오목렌즈 형태의 왜곡</li><li>양수 값: 볼록렌즈 형태의 왜곡</li><li><code dir=\"ltr\">0</code>: 왜곡 없음</li></ul><p>해당 컴포넌트는 설정한 값으로 변화한 뒤 자동으로 원래 상태로 돌아옵니다.</p>"
         }
       ]
+    },
+    "custom_1782872569574": {
+      "label": "AE(Abillity Event)",
+      "icon": "🧨",
+      "desc": "어빌리티 이벤트 컴포넌트에 관련된 내용을 설명하는 탭 입니다.",
+      "items": [
+        {
+          "id": 1782872775625,
+          "title": "어빌리티 이벤트 공통 설정",
+          "author": "박찬만",
+          "tags": [
+            "Unity",
+            "참고",
+            "어빌리티",
+            "이벤트",
+            "AE"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>AE 공통 설정</h2><p class=\"isSelectedEnd\">AE는 <code dir=\"ltr\">Ability Event</code>의 약자로, 어빌리티 내부에서만 할당하고 실행하는 컴포넌트입니다.</p><p class=\"isSelectedEnd\">일반 오브젝트나 어빌리티 외부에서는 사용할 수 없습니다.</p><p class=\"isSelectedEnd\">컴포넌트의 <code dir=\"ltr\">어빌리티 실행 시 플레이</code> 옵션을 활성화하면 별도의 이벤트를 지정하지 않아도 어빌리티가 시작될 때 자동으로 실행됩니다.</p><p class=\"isSelectedEnd\">해당 옵션을 비활성화한 경우에는 원하는 이벤트에 컴포넌트를 직접 할당하고 <code dir=\"ltr\">Play()</code>를 실행해야 합니다.</p><p>아래 목록은 현재 사용 방법이 확인된 컴포넌트만 작성되어 있습니다. 사용 방법을 확인하지 못했거나 다른 작업자의 요청으로 제작된 컴포넌트는 제외되어 있습니다.</p>"
+        },
+        {
+          "id": 1782872823720,
+          "title": "1. AE_Ability Buffer",
+          "author": "박찬만",
+          "tags": [
+            "Unity",
+            "참고",
+            "버퍼",
+            "코요태타임",
+            "어빌리티",
+            "이벤트"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>AE_Ability Buffer</h2><p class=\"isSelectedEnd\">어빌리티 입력에 유예 시간을 적용하는 컴포넌트입니다.</p><p class=\"isSelectedEnd\">쿨타임이 끝나기 직전에 입력한 명령을 저장해 두었다가, 쿨타임이 끝나는 즉시 어빌리티를 실행합니다.</p><h3><br></h3><h3>사용 방법</h3><ol data-spread=\"false\" start=\"1\"><li>어빌리티에 <code dir=\"ltr\">AE_Ability Buffer</code>를 추가합니다.</li><li>별도의 이벤트 할당 없이 버퍼 시간을 설정합니다.</li></ol><h3><br></h3><h3>예시</h3><p class=\"isSelectedEnd\">쿨타임이 <code dir=\"ltr\">1.5초</code>인 어빌리티에 버퍼 시간을 <code dir=\"ltr\">0.2초</code>로 설정한 경우, 쿨타임이 <code dir=\"ltr\">1.3초</code>까지 진행된 시점부터 입력을 미리 받을 수 있습니다.</p><p class=\"isSelectedEnd\">이 구간에 입력된 명령은 저장되며, 쿨타임이 종료되는 즉시 실행됩니다.</p><p>점프 버퍼링이나 코요테 타임과 비슷한 원리라고 생각하면 됩니다.</p>"
+        },
+        {
+          "id": 1782872850470,
+          "title": "2. AE_Another Cool",
+          "author": "박찬만",
+          "tags": [
+            "Unity",
+            "참고",
+            "쿨타임",
+            "어빌리티",
+            "이벤트"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>AE_Another Cool</h2><p class=\"isSelectedEnd\">A 어빌리티에서 B 어빌리티의 쿨타임을 조절할 때 사용하는 컴포넌트입니다.</p><h3><br></h3><h3>사용 방법</h3><ol data-spread=\"false\" start=\"1\"><li>컴포넌트에서 쿨타임을 변경할 대상 어빌리티의 태그를 설정합니다.</li><li>쿨타임을 변경할 시점의 이벤트에 해당 컴포넌트를 할당합니다.</li><li>대상 어빌리티에 적용할 쿨타임 값을 입력합니다.</li></ol><h3><br></h3><h3>예시</h3><p class=\"isSelectedEnd\">A 어빌리티의 종료 이벤트에 <code dir=\"ltr\">AE_Another Cool</code>을 할당하고, B 어빌리티의 쿨타임을 <code dir=\"ltr\">0.1초</code>로 설정한 경우:</p><p>A 어빌리티가 종료되는 순간 B 어빌리티의 남은 쿨타임이 <code dir=\"ltr\">0.1초</code>로 변경됩니다.</p>"
+        },
+        {
+          "id": 1782872881110,
+          "title": "3. AE_Cool Time",
+          "author": "박찬만",
+          "tags": [
+            "Unity",
+            "참고",
+            "어빌리티",
+            "이벤트",
+            "쿨타임"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>AE_Cool Time</h2><p class=\"isSelectedEnd\">현재 어빌리티의 쿨타임 시작 시점과 쿨타임 값을 설정하는 컴포넌트입니다.</p><h3><br></h3><h3>사용 방법</h3><ul data-spread=\"false\"><li>특정 이벤트에 컴포넌트를 할당하여 해당 이벤트가 실행되는 시점부터 쿨타임을 시작할 수 있습니다.</li><li><code dir=\"ltr\">어빌리티 실행 시 플레이</code>를 활성화하면 어빌리티가 시작되는 시점부터 쿨타임이 진행됩니다.</li></ul><h3><br></h3><h3>예시</h3><p class=\"isSelectedEnd\">어빌리티 종료 시점부터 <code dir=\"ltr\">3초</code>의 쿨타임을 적용하려면 다음과 같이 설정합니다.</p><ol data-spread=\"false\" start=\"1\"><li><code dir=\"ltr\">AE_Cool Time</code>의 쿨타임을 <code dir=\"ltr\">3초</code>로 설정합니다.</li><li>어빌리티 종료 이벤트에 컴포넌트를 할당합니다.</li><li>종료 이벤트에서 <code dir=\"ltr\">Play()</code>를 실행합니다.</li></ol><div contenteditable=\"false\"><hr></div><h2></h2>"
+        },
+        {
+          "id": 1782872940244,
+          "title": "4. AE_Motion Trail",
+          "author": "박찬만",
+          "tags": [
+            "Unity",
+            "참고",
+            "산데비스탄",
+            "모션트레일",
+            "잔상",
+            "어빌리티",
+            "이벤트",
+            "트레일"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>AE_Motion Trail</h2><p class=\"isSelectedEnd\">어빌리티 실행 중 캐릭터의 잔상을 생성하는 컴포넌트입니다.</p><p class=\"isSelectedEnd\">산데비스탄과 유사한 잔상 연출에 사용할 수 있습니다.</p><p class=\"isSelectedEnd\">잔상이 생성되는 간격은 캐릭터가 이동한 거리를 기준으로 설정할 수 있습니다.</p><h3><br></h3><h3>사용 방법</h3><p><code dir=\"ltr\">어빌리티 실행 시 플레이</code>를 활성화하면 어빌리티가 실행되는 동안 잔상이 자동으로 재생되며, 어빌리티가 종료되면 함께 종료됩니다.</p>"
+        },
+        {
+          "id": 1782872986848,
+          "title": "5. Time Scaler",
+          "author": "박찬만",
+          "tags": [
+            "Unity",
+            "참고",
+            "타임스케일",
+            "불릿타임",
+            "타임불릿",
+            "어빌리티",
+            "이벤트"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>Time Scaler</h2><p class=\"isSelectedEnd\">어빌리티 실행 중 불릿 타임과 같은 슬로 모션 효과를 적용하는 컴포넌트입니다.</p><h3><br></h3><h3>주요 설정</h3><h4><br></h4><h4>시간 배율</h4><ul data-spread=\"false\"><li><code dir=\"ltr\">1</code>: 정상 속도</li><li><code dir=\"ltr\">1</code>보다 작은 값: 느려짐</li><li>값이 낮을수록 더 강한 슬로 모션 적용</li></ul><h4><br></h4><h4>지속 시간</h4><p class=\"isSelectedEnd\">지속 시간은 절대시간을 기준으로 계산됩니다.</p><p class=\"isSelectedEnd\">따라서 Time Scale이 낮아져도 설정한 지속 시간이 함께 느려지지는 않습니다.</p><p class=\"isSelectedEnd\">예를 들어 지속 시간을 <code dir=\"ltr\">0.2초</code>로 설정하면, Time Scale과 관계없이 실제 시간 기준으로 <code dir=\"ltr\">0.2초</code> 동안 적용됩니다.</p><div contenteditable=\"false\"><hr></div><h2></h2>"
+        },
+        {
+          "id": 1782873037784,
+          "title": "6. AE_VFX Player/VFX Pool",
+          "author": "박찬만",
+          "tags": [
+            "Unity",
+            "참고",
+            "어빌리티",
+            "이벤트",
+            "이펙트"
+          ],
+          "date": "2026. 7. 1.",
+          "body": "<h2>&nbsp;AE_VFX Player</h2><p class=\"isSelectedEnd\">어빌리티 실행 중 이펙트를 재생하는 컴포넌트입니다.</p><p class=\"isSelectedEnd\"><code dir=\"ltr\">AE_VFX Player</code>는 반드시 <code dir=\"ltr\">VFX Pool</code> 컴포넌트와 함께 사용해야 합니다.</p><h3><br></h3><h3>기본 설정 방법</h3><ol data-spread=\"false\" start=\"1\"><li>같은 오브젝트 또는 VFX 그룹에 <code dir=\"ltr\">VFX Pool</code>을 추가합니다.</li><li><code dir=\"ltr\">VFX Pool</code>에 재생할 이펙트 프리팹을 등록합니다.</li><li>등록한 이펙트에 사용할 이름을 지정합니다.</li><li><code dir=\"ltr\">AE_VFX Player</code>에서 재생할 이펙트의 이름을 입력합니다.</li><li>원하는 이벤트에 재생 함수를 할당합니다.</li></ol><p class=\"isSelectedEnd\"><code dir=\"ltr\">VFX Pool</code>에 등록한 이름과 <code dir=\"ltr\">AE_VFX Player</code>에 입력한 이름이 일치해야 정상적으로 재생됩니다.</p><h3><br></h3><h3>재생 함수 명칭</h3><p class=\"isSelectedEnd\">이벤트에 함수를 할당하면 다양한 재생 함수가 표시됩니다.</p><p class=\"isSelectedEnd\">함수 이름에 포함된 단어는 다음과 같은 의미를 가집니다.</p><h4><br></h4><h4>Position</h4><p class=\"isSelectedEnd\">이벤트가 발생한 시점의 위치를 기준으로 이펙트를 재생합니다.</p><h4><br></h4><h4>Ability Direction</h4><p class=\"isSelectedEnd\">어빌리티가 진행되는 방향을 기준으로 이펙트 방향을 설정합니다.</p><h4><br></h4><h4>Rotation</h4><p class=\"isSelectedEnd\">이벤트가 발생한 시점의 회전값을 기준으로 이펙트를 재생합니다.</p><h4><br></h4><h4>DeAttach</h4><p class=\"isSelectedEnd\">이펙트를 재생한 뒤 캐릭터 또는 기준 오브젝트를 따라가지 않도록 분리합니다.</p><h3><br></h3><h3>예시</h3><p class=\"isSelectedEnd\"><code dir=\"ltr\">PlayVFXPositionRotationDeAttach</code>를 사용하면 이펙트가 재생되는 순간의 위치와 회전값을 기준으로 생성됩니다.</p><p>생성된 이후에는 플레이어 캐릭터가 이동하거나 회전해도 이펙트가 플레이어를 따라가지 않습니다.</p>"
+        }
+      ]
     }
   },
   "board": {
@@ -272,7 +383,8 @@
           "prefab",
           "tools",
           "custom_1782819756828",
-          "custom_1782871213933"
+          "custom_1782871213933",
+          "custom_1782872569574"
         ]
       }
     ]
