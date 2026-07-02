@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>라이브러리 관리자</title>
+<style>
+  :root {
+    --bg: #0f0f11; --bg2: #17171a; --bg3: #1e1e22;
+    --border: #2a2a30; --border2: #38383f;
+    --text: #e8e8ec; --text2: #9898a8; --text3: #606070;
+    --accent: #7c6af7; --accent2: #a594f9;
+    --danger: #cf4f4f; --success: #4fcf7a;
+    --pinned-text: #f0a040;
+    --radius: 10px; --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif; min-height: 100vh; }
+
+  /* ── 비밀번호 화면 ── */
+  .lock-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 999; flex-direction: column; gap: 24px; }
+  .lock-box { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 36px 40px; width: 320px; text-align: center; }
+  .lock-icon { font-size: 32px; margin-bottom: 12px; }
+  .lock-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .lock-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+  .lock-input { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-size: 18px; padding: 12px; text-align: center; letter-spacing: 6px; outline: none; margin-bottom: 12px; font-family: monospace; }
+  .lock-input:focus { border-color: var(--accent); }
+  .lock-btn { width: 100%; padding: 11px; border-radius: var(--radius-sm); background: var(--accent); border: none; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity .15s; }
+  .lock-btn:hover { opacity: 0.88; }
+  .lock-error { font-size: 12px; color: var(--danger); margin-top: 8px; min-height: 16px; }
+
+  /* ── 앱 전체 ── */
+  #app { display: none; }
+
+  header { border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: rgba(15,15,17,0.95); backdrop-filter: blur(12px); z-index: 10; }
+  .logo { font-size: 15px; font-weight: 600; }
+  .logo span { color: var(--accent2); }
+  .badge { font-size: 10px; background: var(--danger); color: #fff; padding: 2px 7px; border-radius: 4px; margin-left: 8px; }
+  .back-link { font-size: 12px; color: var(--text3); text-decoration: none; border: 1px solid var(--border); padding: 5px 12px; border-radius: var(--radius-sm); transition: all .15s; }
+  .back-link:hover { color: var(--text2); border-color: var(--border2); }
+
+  .layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 56px); }
+  .sidebar { border-right: 1px solid var(--border); padding: 20px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .sidebar-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; padding: 0 20px; margin-bottom: 4px; margin-top: 12px; }
+  .sidebar-label:first-child { margin-top: 0; }
+  .sidebar-btn { width: 100%; padding: 8px 20px; text-align: left; background: transparent; border: none; cursor: pointer; font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 8px; transition: all .1s; border-left: 2px solid transparent; }
+  .sidebar-btn:hover { color: var(--text); background: var(--bg2); }
+  .sidebar-btn.active { color: var(--text); background: var(--bg3); border-left-color: var(--accent); }
+  .sidebar-btn.pinned-nav.active { border-left-color: var(--pinned-text); color: var(--pinned-text); }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 8px 20px; }
+
+  .main { padding: 32px 40px; max-width: 900px; }
+  .page { display: none; } .page.active { display: block; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+
+  /* 버튼 */
+  .btn { padding: 7px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; font-size: 13px; transition: all .15s; }
+  .btn:hover { background: var(--bg3); color: var(--text); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { opacity: 0.88; color: #fff; background: var(--accent); }
+  .btn-danger { color: var(--danger); border-color: transparent; }
+  .btn-danger:hover { background: rgba(207,79,79,0.1); border-color: var(--danger); }
+  .btn-success { background: var(--success); border-color: var(--success); color: #0f0f11; font-weight: 600; }
+  .btn-success:hover { opacity: 0.9; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+  /* 폼 */
+  .form-group { margin-bottom: 14px; }
+  label { display: block; font-size: 12px; color: var(--text3); margin-bottom: 5px; font-weight: 500; }
+  input, textarea, select { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 13px; padding: 9px 12px; outline: none; transition: border-color .15s; font-family: inherit; }
+  input:focus, textarea:focus, select:focus { border-color: var(--border2); }
+  select option { background: var(--bg2); }
+
+  /* 카드 */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-info { flex: 1; min-width: 0; }
+  .card-title { font-size: 14px; font-weight: 500; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .card-meta { font-size: 12px; color: var(--text3); }
+  .card-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+
+  .hashtag { display: inline-flex; align-items: center; gap: 3px; background: #1e2040; color: #a594f9; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; border: 1px solid #3a3060; }
+  .hashtag .ht-remove { cursor: pointer; color: #7060c0; font-size: 14px; line-height: 1; }
+  .hashtag .ht-remove:hover { color: #cf7a7a; }
+  .hashtag-area { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); min-height: 42px; cursor: text; transition: border-color .15s; }
+  .hashtag-area:focus-within { border-color: var(--border2); }
+  .hashtag-input { border: none; background: transparent; color: var(--text); font-size: 13px; outline: none; min-width: 120px; flex: 1; padding: 2px 0; font-family: inherit; }
+  .hashtag-input::placeholder { color: var(--text3); }
+  .tag-suggestions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+  .tag-suggest-btn { background: transparent; border: 1px solid var(--border); border-radius: 20px; color: var(--text3); font-size: 11px; padding: 2px 9px; cursor: pointer; transition: all .15s; }
+  .tag-suggest-btn:hover { border-color: var(--accent); color: var(--accent2); background: rgba(124,106,247,0.08); }
+
+  /* 편집 패널 */
+  .edit-panel { background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .edit-panel-title { font-size: 13px; font-weight: 600; color: var(--accent2); margin-bottom: 14px; }
+  .edit-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+
+  /* 에디터 */
+  .editor-wrap { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; transition: border-color .15s; }
+  .editor-wrap:focus-within { border-color: var(--border2); }
+  .editor-toolbar { display: flex; align-items: center; gap: 2px; padding: 6px 8px; background: var(--bg3); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .tb-btn { background: transparent; border: none; color: var(--text3); cursor: pointer; padding: 4px 7px; border-radius: 4px; font-size: 12px; font-family: inherit; line-height: 1; transition: all .1s; }
+  .tb-btn:hover { background: var(--bg2); color: var(--text); }
+  .tb-sep { width: 1px; height: 16px; background: var(--border); margin: 0 4px; }
+  .tb-fontsize { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); cursor: pointer; padding: 3px 6px; border-radius: 4px; font-size: 12px; font-family: inherit; outline: none; }
+  .tb-fontsize:hover { border-color: var(--border2); color: var(--text); }
+  .tb-color-wrap { position: relative; width: 24px; height: 24px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0; transition: border-color .1s; }
+  .tb-color-wrap:hover { border-color: var(--border2); }
+  .tb-color-swatch { width: 100%; height: 100%; pointer-events: none; }
+  .tb-color-wrap input[type="color"] { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); border: none; padding: 0; cursor: pointer; opacity: 0; }
+  .tb-color-reset { background: transparent; border: 1px solid var(--border); color: var(--text3); cursor: pointer; padding: 3px 7px; border-radius: 4px; font-size: 11px; line-height: 1; transition: all .1s; }
+  .tb-color-reset:hover { border-color: var(--border2); color: var(--text); }
+  .tb-img-label { background: transparent; border: none; color: var(--text3); cursor: pointer; padding: 4px 7px; border-radius: 4px; font-size: 12px; line-height: 1; transition: all .1s; display: flex; align-items: center; gap: 4px; }
+  .tb-img-label:hover { background: var(--bg2); color: var(--text); }
+  .editor-body { min-height: 280px; max-height: 520px; padding: 14px 16px; background: var(--bg2); color: var(--text); font-size: 13px; line-height: 1.8; outline: none; overflow-y: auto; }
+  .editor-body img { max-width: 100%; border-radius: 6px; margin: 6px 0; display: block; }
+  .editor-body:empty:before { content: attr(data-placeholder); color: var(--text3); pointer-events: none; white-space: pre-line; }
+  .editor-body code { background: var(--bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: monospace; color: var(--accent2); }
+  .editor-body hr { border: none; border-top: 1px solid var(--border2); margin: 10px 0; }
+  .img-drop-hint { font-size: 11px; color: var(--text3); padding: 4px 8px; }
+
+  /* 탭 관리 */
+  .tab-manage-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .tab-manage-box h4 { font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--text2); }
+  .tab-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--bg3); border-radius: var(--radius-sm); margin-bottom: 6px; }
+  .tab-row-icon { font-size: 14px; width: 20px; text-align: center; }
+  .tab-row-label { flex: 1; font-size: 13px; color: var(--text); }
+  .tab-row-type { font-size: 10px; color: var(--text3); background: var(--bg); padding: 2px 6px; border-radius: 4px; }
+  .tab-row-actions { display: flex; gap: 4px; }
+  .new-tab-form { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .new-tab-form input { flex: 1; min-width: 120px; }
+  .new-tab-form select { width: 90px; flex-shrink: 0; }
+
+  /* 탭 인라인 수정 */
+  .tab-edit-form { background: var(--bg); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 6px; margin-bottom: 6px; display: flex; flex-direction: column; gap: 8px; }
+  .tab-edit-form .tab-edit-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .tab-edit-form .tab-edit-row input { flex: 1; min-width: 100px; }
+  .tab-edit-form .tab-edit-row input.icon-input { width: 70px; flex: none; }
+  .tab-edit-form .tab-edit-row select { flex: 1; min-width: 100px; }
+  .tab-edit-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+  /* 그룹 관리 */
+  .group-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .group-box-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+  .group-box-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); }
+  .group-box-actions { display: flex; gap: 4px; }
+  .group-rename-form { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .group-rename-form input.icon-input { width: 60px; flex: none; }
+  .group-rename-form input.label-input { flex: 1; min-width: 100px; }
+  .new-group-form { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+  .new-group-form input.icon-input { width: 60px; flex: none; }
+  .new-group-form input.label-input { flex: 1; min-width: 120px; }
+
+  /* 확인 모달 */
+  .confirm-modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+  .confirm-modal-bg.open { display: flex; }
+  .confirm-modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; padding: 24px; width: 100%; max-width: 360px; text-align: center; }
+  .confirm-modal-icon { font-size: 28px; margin-bottom: 10px; }
+  .confirm-modal-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .confirm-modal-sub { font-size: 12px; color: var(--text3); line-height: 1.6; margin-bottom: 20px; }
+  .confirm-modal-actions { display: flex; gap: 8px; }
+  .confirm-modal-actions .btn { flex: 1; padding: 10px; }
+
+  /* 내보내기 */
+  .export-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; }
+  .export-box h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .export-box p { font-size: 12px; color: var(--text3); line-height: 1.7; margin-bottom: 14px; }
+  .step-list { counter-reset: steps; }
+  .step { display: flex; gap: 12px; margin-bottom: 10px; font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .step::before { counter-increment: steps; content: counter(steps); background: var(--accent); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  code { background: var(--bg); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-family: monospace; color: var(--accent2); }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); padding: 12px 18px; font-size: 13px; color: var(--text); z-index: 9999; transform: translateY(60px); opacity: 0; transition: all .3s; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .empty { text-align: center; padding: 32px 0; color: var(--text3); font-size: 13px; }
+  .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- 비밀번호 화면 -->
+<div class="lock-screen" id="lock-screen">
+  <div class="lock-box">
+    <div class="lock-icon">🔐</div>
+    <div class="lock-title">관리자 페이지</div>
+    <div class="lock-sub">비밀번호를 입력해 주세요</div>
+    <input class="lock-input" type="password" id="pw-input" placeholder="••••" maxlength="20"
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="lock-btn" onclick="checkPw()">입장</button>
+    <div class="lock-error" id="pw-error"></div>
+  </div>
+</div>
+
+<!-- 앱 본체 -->
+<div id="app">
+  <header>
+    <div class="logo">팀 <span>라이브러리</span> <span class="badge">관리자</span></div>
+    <a class="back-link" href="index.html" onclick="return confirmLeaveAdmin(event)">← 라이브러리로</a>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="admin-sidebar"></aside>
+    <main class="main" id="admin-main">
+      <!-- 탭 관리 페이지 -->
+      <div id="page-tab-manage" class="page">
+        <div class="page-header"><div class="page-title">🗂 탭 관리</div></div>
+
+        <div class="tab-manage-box">
+          <h4>➕ 새 그룹 만들기</h4>
+          <div class="new-group-form">
+            <input class="icon-input" id="new-group-icon" placeholder="아이콘 (예: 🎨)">
+            <input class="label-input" id="new-group-label" placeholder="그룹 이름 (예: 아트)">
+            <button class="btn btn-primary btn-sm" onclick="addNewGroup()">+ 그룹 추가</button>
+          </div>
+        </div>
+
+        <div id="group-list-container"></div>
+      </div>
+
+      <!-- 내보내기 페이지 -->
+      <div id="page-export" class="page">
+        <div class="page-header"><div class="page-title">📤 내보내기 & 배포</div></div>
+        <div class="export-box">
+          <h3>1단계 — data.json 다운로드</h3>
+          <p>수정한 내용을 data.json 파일로 저장하세요.<br>GitHub 리포지토리에 올리면 자동 반영됩니다.</p>
+          <button class="btn btn-success" onclick="downloadJSON()">⬇ data.json 다운로드</button>
+        </div>
+        <div class="export-box">
+          <h3>2단계 — GitHub에 올리기</h3>
+          <div class="step-list">
+            <div class="step">GitHub 리포지토리에서 <code>data.json</code> 파일을 클릭</div>
+            <div class="step">연필 아이콘 클릭 → 기존 내용 전체 삭제 후 붙여넣기</div>
+            <div class="step"><code>Commit changes</code> 클릭 → 완료!</div>
+          </div>
+        </div>
+        <div class="export-box">
+          <h3>처음 GitHub Pages 설정</h3>
+          <div class="step-list">
+            <div class="step">GitHub에서 새 리포지토리 생성 (Public)</div>
+            <div class="step"><code>index.html</code>, <code>admin.html</code>, <code>data.json</code> 업로드</div>
+            <div class="step">Settings → Pages → Branch: <code>main</code> → Save</div>
+            <div class="step">몇 분 후 <code>https://유저명.github.io/리포명</code> 접속 가능</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 동적 섹션 페이지들은 JS로 생성 -->
+    </main>
+  </div>
+</div>
+
+<div class="confirm-modal-bg" id="confirm-leave-bg">
+  <div class="confirm-modal">
+    <div class="confirm-modal-icon">🚪</div>
+    <div class="confirm-modal-title">일반 모드로 나가시겠어요?</div>
+    <div class="confirm-modal-sub">저장하지 않은 변경사항은 data.json을 다운로드하지 않으면<br>반영되지 않을 수 있어요.</div>
+    <div class="confirm-modal-actions">
+      <button class="btn" onclick="closeLeaveConfirm()">취소</button>
+      <button class="btn btn-primary" onclick="leaveAdmin()">나가기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PW = '1009';
+const POST_TAGS = ['공지', '공통', '중요'];
+const SUGGEST_TAGS = ['프로그래머', '아트', '기획', '공통', '중요', 'Unity', 'UI', '버그', '참고', '필독'];
+
+let data = null;
+let currentTags = [];
+
+/* ── 비밀번호 ── */
+function checkPw() {
+  const val = document.getElementById('pw-input').value;
+  if (val === ADMIN_PW) {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadData();
+  } else {
+    document.getElementById('pw-error').textContent = '비밀번호가 틀렸습니다.';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+    setTimeout(() => document.getElementById('pw-error').textContent = '', 2000);
+  }
+}
+
+/* ── 관리자 나가기 확인 ── */
+function confirmLeaveAdmin(e) {
+  e.preventDefault();
+  document.getElementById('confirm-leave-bg').classList.add('open');
+  return false;
+}
+function closeLeaveConfirm() {
+  document.getElementById('confirm-leave-bg').classList.remove('open');
+}
+function leaveAdmin() {
+  window.location.href = 'index.html';
+}
+document.getElementById('confirm-leave-bg').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeLeaveConfirm();
+});
+async function loadData() {
+  try {
+    const res = await fetch('./data.json?t=' + Date.now());
+    data = await res.json();
+  } catch(e) {
+    data = {
+      team: { name: '팀 라이브러리', members: [] },
+      sections: {
+        pinned: { label: '필독', icon: '📌', desc: '', pinned: true, items: [] },
+        setup:  { label: '초기 세팅', icon: '🔧', desc: '', pinned: true, items: [] },
+        engine: { label: '엔진 기능', icon: '⚙️', desc: '', items: [] },
+        prefab: { label: '프리팹 세팅', icon: '📦', desc: '', items: [] },
+        tools:  { label: '협업 툴', icon: '🛠️', desc: '', items: [] }
+      },
+      tabs: { groups: [
+        { id: 'g_pinned', icon: '📌', label: '필독', order: ['pinned','setup'] },
+        { id: 'g_doc', icon: '📁', label: '문서', order: ['engine','prefab','tools'] }
+      ] },
+      board: { posts: [] }
+    };
+  }
+  migrateTabsToGroups();
+  buildAdminUI();
+}
+
+/* 기존 pinned_order/doc_order 구조를 groups 배열로 마이그레이션 */
+function migrateTabsToGroups() {
+  if (!data.tabs) data.tabs = {};
+  if (!Array.isArray(data.tabs.groups)) {
+    const pinnedOrder = data.tabs.pinned_order || [];
+    const docOrder = data.tabs.doc_order || [];
+    const groups = [];
+    if (pinnedOrder.length || !docOrder.length) {
+      groups.push({ id: 'g_pinned', icon: '📌', label: '필독', order: [...pinnedOrder] });
+    }
+    groups.push({ id: 'g_doc', icon: '📁', label: '문서', order: [...docOrder] });
+    data.tabs.groups = groups;
+  }
+  delete data.tabs.pinned_order;
+  delete data.tabs.doc_order;
+}
+
+/* ── 사이드바 + 페이지 생성 ── */
+function buildAdminUI() {
+  const groups = data.tabs.groups;
+  const sidebar = document.getElementById('admin-sidebar');
+  const main = document.getElementById('admin-main');
+
+  // 기존 동적 페이지 제거
+  main.querySelectorAll('.dyn-page').forEach(el => el.remove());
+
+  let sb = '';
+
+  sb += `<div class="sidebar-label">탭 관리</div>`;
+  sb += `<button class="sidebar-btn" id="nav-tab-manage" onclick="showAdminPage('tab-manage')">🗂 탭 관리</button>`;
+  sb += `<div class="sidebar-divider"></div>`;
+
+  groups.forEach(group => {
+    if (!group.order.length) return;
+    sb += `<div class="sidebar-label">${esc(group.icon || '')} ${esc(group.label)}</div>`;
+    group.order.forEach(key => {
+      const sec = data.sections[key]; if (!sec) return;
+      const pinnedClass = sec.pinned ? ' pinned-nav' : '';
+      sb += `<button class="sidebar-btn${pinnedClass}" id="nav-${key}" onclick="showAdminPage('${key}')">${sec.icon} ${sec.label}</button>`;
+      insertDynPage(main, key);
+    });
+    sb += `<div class="sidebar-divider"></div>`;
+  });
+
+  sb += `<div class="sidebar-label">소통</div>`;
+  sb += `<button class="sidebar-btn" id="nav-board" onclick="showAdminPage('board')">💬 팀원 공간</button>`;
+  insertDynPage(main, 'board');
+  sb += `<div class="sidebar-divider"></div>`;
+
+  sb += `<div class="sidebar-label">배포</div>`;
+  sb += `<button class="sidebar-btn" id="nav-export" onclick="showAdminPage('export')">📤 내보내기</button>`;
+
+  sidebar.innerHTML = sb;
+
+  // 섹션 렌더
+  groups.forEach(group => {
+    group.order.forEach(key => {
+      if (data.sections[key]) renderAdminSection(key);
+    });
+  });
+  renderAdminBoard();
+  renderTabManage();
+
+  showAdminPage('tab-manage');
+}
+
+function insertDynPage(main, key) {
+  if (!document.getElementById('page-' + key)) {
+    const div = document.createElement('div');
+    div.id = 'page-' + key;
+    div.className = 'page dyn-page';
+    main.appendChild(div);
+  }
+}
+
+function showAdminPage(key) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  const page = document.getElementById('page-' + key);
+  const btn = document.getElementById('nav-' + key);
+  if (page) page.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+/* ── 탭 관리 (그룹 시스템) ── */
+function findGroup(groupId) {
+  return data.tabs.groups.find(g => g.id === groupId);
+}
+
+function renderTabManage() {
+  const groups = data.tabs.groups;
+  const container = document.getElementById('group-list-container');
+  if (!container) return;
+
+  function tabRowHTML(key, groupId) {
+    const sec = data.sections[key]; if (!sec) return '';
+    const groupOptions = groups.map(g => `<option value="${g.id}" ${g.id===groupId?'selected':''}>${esc(g.icon||'')} ${esc(g.label)}</option>`).join('');
+    return `<div id="tabrow-wrap-${key}">
+      <div class="tab-row" id="tabrow-${key}">
+        <span class="tab-row-icon">${sec.icon}</span>
+        <span class="tab-row-label">${sec.label}</span>
+        <div class="tab-row-actions">
+          <button class="btn btn-sm" onclick="moveTab('${key}','${groupId}',-1)" title="위로">↑</button>
+          <button class="btn btn-sm" onclick="moveTab('${key}','${groupId}',1)" title="아래로">↓</button>
+          <button class="btn btn-sm" onclick="showTabEditForm('${key}','${groupId}')">수정</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteTab('${key}','${groupId}')">삭제</button>
+        </div>
+      </div>
+      <div id="tab-edit-form-${key}" style="display:none"></div>
+    </div>`;
+  }
+
+  function groupBoxHTML(group, gi) {
+    const isFirst = gi === 0;
+    const isLast = gi === groups.length - 1;
+    return `<div class="group-box" id="groupbox-${group.id}">
+      <div class="group-box-head">
+        <div class="group-box-title">${esc(group.icon || '')} ${esc(group.label)} <span style="color:var(--text3);font-weight:400;font-size:11px">(${group.order.length})</span></div>
+        <div class="group-box-actions">
+          <button class="btn btn-sm" onclick="moveGroup('${group.id}',-1)" ${isFirst?'disabled style="opacity:0.25;cursor:default"':''} title="그룹 위로">↑</button>
+          <button class="btn btn-sm" onclick="moveGroup('${group.id}',1)" ${isLast?'disabled style="opacity:0.25;cursor:default"':''} title="그룹 아래로">↓</button>
+          <button class="btn btn-sm" onclick="toggleGroupRename('${group.id}')">그룹 수정</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteGroup('${group.id}')">그룹 삭제</button>
+        </div>
+      </div>
+      <div id="group-rename-${group.id}" style="display:none"></div>
+      <div id="grouptabs-${group.id}">
+        ${group.order.length ? group.order.map(k => tabRowHTML(k, group.id)).join('') : '<div class="empty" style="padding:10px">이 그룹에 탭이 없어요</div>'}
+      </div>
+      <div class="new-tab-form">
+        <input class="icon-input" id="new-tab-icon-${group.id}" placeholder="아이콘">
+        <input class="label-input" id="new-tab-label-${group.id}" placeholder="탭 이름">
+        <input id="new-tab-desc-${group.id}" placeholder="탭 설명" style="flex:1;min-width:120px">
+        <button class="btn btn-primary btn-sm" onclick="addNewTab('${group.id}')">+ 탭 추가</button>
+      </div>
+    </div>`;
+  }
+
+  container.innerHTML = groups.map((g, gi) => groupBoxHTML(g, gi)).join('');
+}
+
+/* ── 그룹 추가/이름변경/삭제/순서 ── */
+function addNewGroup() {
+  const iconEl = document.getElementById('new-group-icon');
+  const labelEl = document.getElementById('new-group-label');
+  const label = labelEl.value.trim();
+  if (!label) { toast('그룹 이름을 입력해 주세요'); return; }
+  const icon = iconEl.value.trim() || '📁';
+  data.tabs.groups.push({ id: 'g_' + Date.now(), icon, label, order: [] });
+  iconEl.value = ''; labelEl.value = '';
+  buildAdminUI();
+  showAdminPage('tab-manage');
+  toast(`"${label}" 그룹 추가 완료!`);
+}
+
+function moveGroup(groupId, dir) {
+  const groups = data.tabs.groups;
+  const i = groups.findIndex(g => g.id === groupId);
+  if (i < 0) return;
+  const ni = i + dir;
+  if (ni < 0 || ni >= groups.length) return;
+  [groups[i], groups[ni]] = [groups[ni], groups[i]];
+  buildAdminUI();
+  showAdminPage('tab-manage');
+}
+
+function deleteGroup(groupId) {
+  const group = findGroup(groupId);
+  if (!group) return;
+  if (group.order.length > 0) {
+    toast('그룹 안에 탭이 있어요. 먼저 탭을 다른 그룹으로 옮기거나 삭제해 주세요');
+    return;
+  }
+  if (!confirm(`"${group.label}" 그룹을 삭제할까요?`)) return;
+  data.tabs.groups = data.tabs.groups.filter(g => g.id !== groupId);
+  buildAdminUI();
+  showAdminPage('tab-manage');
+  toast('그룹 삭제 완료');
+}
+
+function toggleGroupRename(groupId) {
+  document.querySelectorAll('[id^="group-rename-"]').forEach(el => {
+    if (el.id !== 'group-rename-' + groupId) { el.style.display = 'none'; el.innerHTML = ''; }
+  });
+  const el = document.getElementById('group-rename-' + groupId);
+  if (!el) return;
+  if (el.style.display !== 'none' && el.innerHTML !== '') {
+    el.style.display = 'none'; el.innerHTML = ''; return;
+  }
+  const group = findGroup(groupId);
+  el.innerHTML = `
+    <div class="group-rename-form">
+      <input class="icon-input" id="grename-icon-${groupId}" value="${esc(group.icon || '')}" placeholder="아이콘">
+      <input class="label-input" id="grename-label-${groupId}" value="${esc(group.label)}" placeholder="그룹 이름">
+      <button class="btn btn-sm" onclick="toggleGroupRename('${groupId}')">취소</button>
+      <button class="btn btn-sm btn-primary" onclick="saveGroupRename('${groupId}')">저장</button>
+    </div>`;
+  el.style.display = 'block';
+  document.getElementById('grename-label-' + groupId)?.focus();
+}
+
+function saveGroupRename(groupId) {
+  const label = document.getElementById('grename-label-' + groupId)?.value.trim();
+  if (!label) { toast('그룹 이름을 입력해 주세요'); return; }
+  const icon = document.getElementById('grename-icon-' + groupId)?.value.trim() || '📁';
+  const group = findGroup(groupId);
+  group.label = label;
+  group.icon = icon;
+  buildAdminUI();
+  showAdminPage('tab-manage');
+  toast(`"${label}" 그룹 수정 완료!`);
+}
+
+/* ── 탭(섹션) 추가/이동/수정/삭제 ── */
+function addNewTab(groupId) {
+  const iconEl = document.getElementById(`new-tab-icon-${groupId}`);
+  const labelEl = document.getElementById(`new-tab-label-${groupId}`);
+  const descEl = document.getElementById(`new-tab-desc-${groupId}`);
+  const label = labelEl.value.trim();
+  if (!label) { toast('탭 이름을 입력해 주세요'); return; }
+  const icon = iconEl.value.trim() || '📁';
+  const key = 'custom_' + Date.now();
+  data.sections[key] = { label, icon, desc: descEl.value.trim(), items: [] };
+  findGroup(groupId).order.push(key);
+  iconEl.value = ''; labelEl.value = ''; descEl.value = '';
+  buildAdminUI();
+  showAdminPage('tab-manage');
+  toast(`"${label}" 탭 추가 완료!`);
+}
+
+function moveTab(key, groupId, dir) {
+  const arr = findGroup(groupId).order;
+  const i = arr.indexOf(key);
+  if (i < 0) return;
+  const ni = i + dir;
+  if (ni < 0 || ni >= arr.length) return;
+  [arr[i], arr[ni]] = [arr[ni], arr[i]];
+  buildAdminUI();
+  showAdminPage('tab-manage');
+}
+
+function deleteTab(key, groupId) {
+  const sec = data.sections[key];
+  if (!confirm(`"${sec?.label}" 탭을 삭제할까요?\n탭 안의 항목도 모두 삭제됩니다.`)) return;
+  const arr = findGroup(groupId).order;
+  const i = arr.indexOf(key);
+  if (i >= 0) arr.splice(i, 1);
+  delete data.sections[key];
+  buildAdminUI();
+  showAdminPage('tab-manage');
+  toast('탭 삭제 완료');
+}
+
+function showTabEditForm(key, groupId) {
+  // 다른 열려있는 수정 폼 모두 닫기
+  document.querySelectorAll('[id^="tab-edit-form-"]').forEach(el => {
+    if (el.id !== 'tab-edit-form-' + key) { el.style.display = 'none'; el.innerHTML = ''; }
+  });
+
+  const formEl = document.getElementById('tab-edit-form-' + key);
+  if (!formEl) return;
+
+  // 토글: 이미 열려 있으면 닫기
+  if (formEl.style.display !== 'none' && formEl.innerHTML !== '') {
+    formEl.style.display = 'none'; formEl.innerHTML = ''; return;
+  }
+
+  const sec = data.sections[key];
+  const groups = data.tabs.groups;
+  const groupOptions = groups.map(g => `<option value="${g.id}" ${g.id===groupId?'selected':''}>${esc(g.icon||'')} ${esc(g.label)}</option>`).join('');
+  formEl.innerHTML = `
+    <div class="tab-edit-form">
+      <div style="font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:2px">탭 정보 수정</div>
+      <div class="tab-edit-row">
+        <input class="icon-input" id="tedit-icon-${key}" value="${esc(sec.icon)}" placeholder="아이콘">
+        <input id="tedit-label-${key}" value="${esc(sec.label)}" placeholder="탭 이름">
+      </div>
+      <div class="tab-edit-row">
+        <input id="tedit-desc-${key}" value="${esc(sec.desc || '')}" placeholder="탭 설명 (선택)">
+      </div>
+      <div class="tab-edit-row">
+        <label style="margin:0;font-size:12px;color:var(--text3);white-space:nowrap">소속 그룹</label>
+        <select id="tedit-group-${key}">${groupOptions}</select>
+      </div>
+      <div class="tab-edit-actions">
+        <button class="btn btn-sm" onclick="closeTabEditForm('${key}')">취소</button>
+        <button class="btn btn-sm btn-primary" onclick="saveTabEdit('${key}','${groupId}')">저장</button>
+      </div>
+    </div>`;
+  formEl.style.display = 'block';
+  document.getElementById('tedit-label-' + key)?.focus();
+}
+
+function closeTabEditForm(key) {
+  const el = document.getElementById('tab-edit-form-' + key);
+  if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+}
+
+function saveTabEdit(key, oldGroupId) {
+  const label = document.getElementById('tedit-label-' + key)?.value.trim();
+  if (!label) { toast('탭 이름을 입력해 주세요'); return; }
+  const icon = document.getElementById('tedit-icon-' + key)?.value.trim() || '📁';
+  const desc = document.getElementById('tedit-desc-' + key)?.value.trim() || '';
+  const newGroupId = document.getElementById('tedit-group-' + key)?.value || oldGroupId;
+
+  data.sections[key].label = label;
+  data.sections[key].icon = icon;
+  data.sections[key].desc = desc;
+
+  if (newGroupId !== oldGroupId) {
+    const oldArr = findGroup(oldGroupId)?.order;
+    if (oldArr) {
+      const i = oldArr.indexOf(key);
+      if (i >= 0) oldArr.splice(i, 1);
+    }
+    const newArr = findGroup(newGroupId)?.order;
+    if (newArr) newArr.push(key);
+  }
+
+  buildAdminUI();
+  showAdminPage('tab-manage');
+  toast(`"${label}" 탭 수정 완료!`);
+}
+
+/* ── 섹션 항목 렌더 ── */
+function renderAdminSection(key) {
+  const sec = data.sections[key];
+  const el = document.getElementById('page-' + key);
+  if (!el) return;
+  const items = sec.items || [];
+  el.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">${sec.icon} ${sec.label}</div>
+      <button class="btn btn-primary" onclick="showAddForm('${key}')">+ 항목 추가</button>
+    </div>
+    <div id="form-${key}"></div>
+    <div id="list-${key}">
+      ${items.length === 0 ? '<div class="empty">항목이 없어요.</div>'
+        : items.map((item, i) => {
+          const tags = Array.isArray(item.tags) ? item.tags : (item.tag ? [item.tag] : []);
+          const tagHTML = tags.map(t => `<span class="hashtag">#${t}</span>`).join('');
+          const isFirst = i === 0;
+          const isLast = i === items.length - 1;
+          return `<div class="card" id="item-card-${key}-${i}">
+            <div class="card-order" style="display:flex;flex-direction:column;gap:2px;flex-shrink:0;margin-right:4px">
+              <button class="btn btn-sm" onclick="moveItem('${key}',${i},-1)" ${isFirst ? 'disabled style="opacity:0.25;cursor:default"' : ''} title="위로">↑</button>
+              <button class="btn btn-sm" onclick="moveItem('${key}',${i},1)" ${isLast ? 'disabled style="opacity:0.25;cursor:default"' : ''} title="아래로">↓</button>
+            </div>
+            <div class="card-info">
+              <div class="card-title">${item.title} ${tagHTML}</div>
+              <div class="card-meta">${item.author || ''} · ${item.date || ''}</div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-sm" onclick="showEditForm('${key}',${i})">수정</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteItem('${key}',${i})">삭제</button>
+            </div>
+          </div>`;
+        }).join('')}
+    </div>`;
+}
+
+function moveItem(key, i, dir) {
+  const items = data.sections[key].items;
+  const ni = i + dir;
+  if (ni < 0 || ni >= items.length) return;
+  [items[i], items[ni]] = [items[ni], items[i]];
+  renderAdminSection(key);
+}
+
+/* ── 항목 폼 ── */
+function showAddForm(key) {
+  document.getElementById('form-' + key).innerHTML = buildEntryForm(key, null, -1);
+  setTimeout(() => { initTagInput(); initEditor(); }, 0);
+  document.getElementById('form-' + key).scrollIntoView({ behavior: 'smooth' });
+}
+
+function showEditForm(key, i) {
+  const item = data.sections[key].items[i];
+  document.getElementById('form-' + key).innerHTML = buildEntryForm(key, item, i);
+  setTimeout(() => { initTagInput(); initEditor(); }, 0);
+  document.getElementById('form-' + key).scrollIntoView({ behavior: 'smooth' });
+}
+
+function buildEntryForm(key, item, idx) {
+  const isEdit = idx >= 0;
+  const existing = isEdit ? (Array.isArray(item.tags) ? item.tags : (item.tag ? [item.tag] : [])) : [];
+  currentTags = [...existing];
+  return `<div class="edit-panel">
+    <div class="edit-panel-title">${isEdit ? '항목 수정' : '새 항목 추가'}</div>
+    <div class="form-group"><label>제목</label><input id="f-title" value="${isEdit ? esc(item.title) : ''}"></div>
+    <div class="form-group"><label>작성자</label><input id="f-author" value="${isEdit ? esc(item.author||'') : ''}"></div>
+    <div class="form-group">
+      <label>해시태그 <span style="color:var(--text3);font-weight:400">— Enter 또는 Space로 추가</span></label>
+      <div class="hashtag-area" id="hashtag-area" onclick="document.getElementById('f-tag-input').focus()">
+        <input class="hashtag-input" id="f-tag-input" placeholder="#태그입력..." autocomplete="off">
+      </div>
+      <div class="tag-suggestions">
+        ${SUGGEST_TAGS.map(t => `<button type="button" class="tag-suggest-btn" onclick="addTag('${t}')">#${t}</button>`).join('')}
+      </div>
+    </div>
+    <div class="form-group">
+      <label>내용</label>
+      <div class="editor-wrap">
+        <div class="editor-toolbar">
+          <button type="button" class="tb-btn" onclick="edFmt('bold')"><b>B</b></button>
+          <button type="button" class="tb-btn" onclick="edFmt('italic')"><i>I</i></button>
+          <button type="button" class="tb-btn" onclick="edFmt('underline')"><u>U</u></button>
+          <div class="tb-sep"></div>
+          <select class="tb-fontsize" id="f-fontsize" onchange="edFontSize(this.value)" title="글자 크기">
+            <option value="">크기</option>
+            <option value="12">12px</option>
+            <option value="13">13px (기본)</option>
+            <option value="15">15px</option>
+            <option value="17">17px</option>
+            <option value="20">20px</option>
+            <option value="24">24px</option>
+            <option value="28">28px</option>
+          </select>
+          <div class="tb-sep"></div>
+          <span class="tb-color-wrap" title="글자 색">
+            <span class="tb-color-swatch" id="f-color-swatch" style="background:#e8e8ec"></span>
+            <input type="color" id="f-color" value="#e8e8ec" oninput="edColor(this.value)">
+          </span>
+          <button type="button" class="tb-color-reset" onclick="edColorReset()" title="색 지우기">초기화</button>
+          <div class="tb-sep"></div>
+          <button type="button" class="tb-btn" onclick="edCode()" style="font-family:monospace;font-size:11px">&lt;/&gt;</button>
+          <button type="button" class="tb-btn" onclick="edHr()">—</button>
+          <div class="tb-sep"></div>
+          <label class="tb-img-label">🖼 이미지<input type="file" id="img-upload" accept="image/*" style="display:none" onchange="insertImageFile(this)"></label>
+          <span class="img-drop-hint">또는 드래그 앤 드롭</span>
+        </div>
+        <div class="editor-body" id="f-body" contenteditable="true"
+          data-placeholder="내용을 입력하세요...">${isEdit ? (item.body || '') : ''}</div>
+      </div>
+    </div>
+    <div class="edit-actions">
+      <button class="btn" onclick="cancelForm('${key}')">취소</button>
+      <button class="btn btn-primary" onclick="saveItem('${key}',${idx})">저장</button>
+    </div>
+  </div>`;
+}
+
+function cancelForm(key) { document.getElementById('form-' + key).innerHTML = ''; }
+
+function saveItem(key, idx) {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { toast('제목을 입력해 주세요'); return; }
+  const bodyEl = document.getElementById('f-body');
+  const item = {
+    id: idx >= 0 ? data.sections[key].items[idx].id : Date.now(),
+    title,
+    author: document.getElementById('f-author').value.trim(),
+    tags: [...currentTags],
+    date: new Date().toLocaleDateString('ko-KR'),
+    body: bodyEl ? bodyEl.innerHTML.trim() : ''
+  };
+  if (idx >= 0) data.sections[key].items[idx] = item;
+  else data.sections[key].items.push(item);
+  cancelForm(key);
+  renderAdminSection(key);
+  toast(idx >= 0 ? '수정 완료!' : '추가 완료!');
+}
+
+function deleteItem(key, i) {
+  if (!confirm('삭제할까요?')) return;
+  data.sections[key].items.splice(i, 1);
+  renderAdminSection(key);
+  toast('삭제 완료');
+}
+
+/* ── 해시태그 ── */
+function renderTagChips() {
+  const area = document.getElementById('hashtag-area');
+  if (!area) return;
+  const input = document.getElementById('f-tag-input');
+  area.innerHTML = '';
+  currentTags.forEach((t, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'hashtag';
+    chip.innerHTML = `#${t} <span class="ht-remove" onclick="removeTag(${i})">×</span>`;
+    area.appendChild(chip);
+  });
+  area.appendChild(input);
+  input.focus();
+}
+
+function addTag(raw) {
+  const val = raw.replace(/^#+/, '').trim();
+  if (!val || currentTags.includes(val)) return;
+  currentTags.push(val);
+  renderTagChips();
+}
+
+function removeTag(i) { currentTags.splice(i, 1); renderTagChips(); }
+
+function initTagInput() {
+  const input = document.getElementById('f-tag-input');
+  if (!input) return;
+  renderTagChips();
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const val = input.value.replace(/^#+/, '').trim();
+      if (val) { addTag(val); input.value = ''; }
+    } else if (e.key === 'Backspace' && input.value === '' && currentTags.length > 0) {
+      currentTags.pop(); renderTagChips();
+    }
+  });
+  input.addEventListener('input', () => {
+    if (input.value.endsWith(' ')) {
+      const val = input.value.replace(/^#+/, '').trim();
+      if (val) { addTag(val); input.value = ''; }
+    }
+  });
+}
+
+/* ── 에디터 ── */
+function initEditor() {
+  const body = document.getElementById('f-body');
+  if (!body) return;
+  body.addEventListener('dragover', e => { e.preventDefault(); body.style.outline = '2px dashed var(--accent)'; });
+  body.addEventListener('dragleave', () => { body.style.outline = ''; });
+  body.addEventListener('drop', e => {
+    e.preventDefault(); body.style.outline = '';
+    [...e.dataTransfer.files].filter(f => f.type.startsWith('image/')).forEach(insertImageFromFile);
+  });
+  body.addEventListener('paste', e => {
+    const items = [...e.clipboardData.items].filter(i => i.type.startsWith('image/'));
+    if (items.length) { e.preventDefault(); items.forEach(i => insertImageFromFile(i.getAsFile())); }
+  });
+}
+
+function edFmt(cmd) { document.getElementById('f-body').focus(); document.execCommand(cmd, false, null); }
+
+/* 선택 영역(또는 커서 위치)을 지정한 스타일의 span으로 감싸는 공통 헬퍼 */
+function wrapSelectionWithStyle(styleProp, styleValue) {
+  const body = document.getElementById('f-body');
+  body.focus();
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+
+  const span = document.createElement('span');
+  span.style[styleProp] = styleValue;
+
+  if (range.collapsed) {
+    // 선택 영역이 없으면: 커서 위치에 빈 span을 넣고 그 안에 입력되게 함
+    span.appendChild(document.createTextNode('\u200b')); // zero-width space로 커서 위치 유지
+    range.insertNode(span);
+    const newRange = document.createRange();
+    newRange.setStart(span.firstChild, 1);
+    newRange.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+  } else {
+    try {
+      range.surroundContents(span);
+    } catch (e) {
+      // 선택 영역이 여러 요소에 걸쳐 있으면 surroundContents가 실패할 수 있음 → extractContents로 대체
+      const content = range.extractContents();
+      span.appendChild(content);
+      range.insertNode(span);
+    }
+    const newRange = document.createRange();
+    newRange.selectNodeContents(span);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+  }
+}
+
+function edFontSize(px) {
+  if (!px) { document.getElementById('f-body').focus(); return; }
+  wrapSelectionWithStyle('fontSize', px + 'px');
+  document.getElementById('f-fontsize').value = '';
+}
+
+function edColor(hex) {
+  document.getElementById('f-color-swatch').style.background = hex;
+  wrapSelectionWithStyle('color', hex);
+}
+
+function edColorReset() {
+  wrapSelectionWithStyle('color', 'inherit');
+}
+
+function edCode() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const text = range.toString(); if (!text) return;
+  const code = document.createElement('code');
+  code.textContent = text;
+  range.deleteContents(); range.insertNode(code);
+  sel.collapseToEnd();
+}
+function edHr() { document.getElementById('f-body').focus(); document.execCommand('insertHTML', false, '<hr>'); }
+
+function insertImageFile(input) {
+  const file = input.files[0]; if (!file) return;
+  insertImageFromFile(file); input.value = '';
+}
+function insertImageFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const body = document.getElementById('f-body'); if (!body) return;
+    body.focus();
+    const img = document.createElement('img');
+    img.src = e.target.result; img.style.maxWidth = '100%';
+    const sel = window.getSelection();
+    if (sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      range.collapse(false); range.insertNode(img);
+      range.setStartAfter(img); range.collapse(true);
+      sel.removeAllRanges(); sel.addRange(range);
+    } else { body.appendChild(img); }
+    toast('이미지 삽입 완료!');
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── 게시판 ── */
+function renderAdminBoard() {
+  const el = document.getElementById('page-board');
+  if (!el) return;
+  const posts = (data.board && data.board.posts) || [];
+  const members = (data.team && data.team.members) || [];
+  el.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">💬 팀원 공간</div>
+      <button class="btn btn-primary" onclick="showAddPost()">+ 글 추가</button>
+    </div>
+    <div id="form-board"></div>
+    <div id="list-board">
+      ${posts.length === 0 ? '<div class="empty">게시물이 없어요.</div>'
+        : posts.slice().reverse().map((p, ri) => {
+          const i = posts.length - 1 - ri;
+          return `<div class="card">
+            <div class="card-info">
+              <div class="card-title">${p.title}${p.tag ? ` <span class="tag">${p.tag}</span>` : ''}</div>
+              <div class="card-meta">${p.author} · ${p.date}</div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-sm btn-danger" onclick="deletePost(${i})">삭제</button>
+            </div>
+          </div>`;
+        }).join('')}
+    </div>`;
+}
+
+function showAddPost() {
+  const members = (data.team && data.team.members) || [];
+  document.getElementById('form-board').innerHTML = `<div class="edit-panel">
+    <div class="edit-panel-title">새 글 추가</div>
+    <div class="form-group"><label>작성자</label>
+      ${members.length > 0
+        ? `<select id="f-pauthor">${members.map(m=>`<option value="${m.name}" data-color="${m.color}">${m.name} (${m.role})</option>`).join('')}</select>`
+        : `<input id="f-pauthor" placeholder="이름">`}
+    </div>
+    <div class="form-group"><label>태그</label>
+      <select id="f-ptag"><option value="">없음</option>${POST_TAGS.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>제목</label><input id="f-ptitle"></div>
+    <div class="form-group"><label>내용</label><textarea id="f-pbody" rows="4" style="min-height:80px"></textarea></div>
+    <div class="edit-actions">
+      <button class="btn" onclick="document.getElementById('form-board').innerHTML=''">취소</button>
+      <button class="btn btn-primary" onclick="savePost()">게시</button>
+    </div>
+  </div>`;
+}
+
+function savePost() {
+  const title = document.getElementById('f-ptitle').value.trim();
+  if (!title) { toast('제목을 입력해 주세요'); return; }
+  const authorEl = document.getElementById('f-pauthor');
+  const authorColor = authorEl.tagName === 'SELECT'
+    ? (authorEl.options[authorEl.selectedIndex]?.dataset.color || '#7c6af7') : '#7c6af7';
+  if (!data.board) data.board = { posts: [] };
+  data.board.posts.push({
+    id: Date.now(), author: authorEl.value.trim(), authorColor,
+    tag: document.getElementById('f-ptag').value,
+    title, body: document.getElementById('f-pbody').value.trim(),
+    date: new Date().toLocaleDateString('ko-KR')
+  });
+  renderAdminBoard(); toast('게시 완료!');
+}
+
+function deletePost(i) {
+  if (!confirm('삭제할까요?')) return;
+  data.board.posts.splice(i, 1);
+  renderAdminBoard(); toast('삭제 완료');
+}
+
+/* ── 내보내기 ── */
+function downloadJSON() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.json';
+  a.click();
+  toast('다운로드 완료! GitHub에 올려주세요 🚀');
+}
+
+/* ── 유틸 ── */
+function esc(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// 엔터로 비밀번호
+document.getElementById('pw-input').focus();
+</script>
+</body>
+</html>
