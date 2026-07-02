@@ -80,44 +80,6 @@
       ],
       "desc": "구글 드라이브, 노션, 깃허브 등 팀 협업 툴 사용 규칙과 방법을 정리해요."
     },
-    "pinned": {
-      "label": "필독",
-      "icon": "📌",
-      "desc": "팀 내 필수 규칙과 공지사항을 확인하세요. 프로젝트 시작 전 반드시 읽어주세요.",
-      "pinned": true,
-      "items": [
-        {
-          "id": 1,
-          "title": "예시: 팀 내 기본 규칙",
-          "author": "팀장",
-          "tags": [
-            "필독",
-            "공통"
-          ],
-          "date": "2025-06-01",
-          "body": "1. 커밋 메시지는 한국어로 명확하게 작성\n2. PR 전 반드시 dev 브랜치 최신화\n3. 작업 시작 전 노션 칸반보드에 티켓 생성\n4. 매주 월요일 오전 10시 팀 미팅"
-        }
-      ]
-    },
-    "setup": {
-      "label": "초기 세팅",
-      "icon": "🔧",
-      "desc": "프로젝트 초기 환경 세팅 방법을 정리해요. 새 팀원은 이 페이지부터 시작하세요.",
-      "pinned": true,
-      "items": [
-        {
-          "id": 1,
-          "title": "예시: Unity 프로젝트 초기 세팅",
-          "author": "프로그래머",
-          "tags": [
-            "초기세팅",
-            "Unity"
-          ],
-          "date": "2025-06-01",
-          "body": "1. GitHub에서 레포 클론\n2. Unity Hub에서 해당 버전 설치 (2022.3.x LTS)\n3. Assets/Plugins 폴더 확인\n4. ProjectSettings/InputManager 확인\n5. Play 버튼으로 정상 실행 확인"
-        }
-      ]
-    },
     "custom_1782819756828": {
       "label": "라이팅/쉐이더",
       "icon": "💡",
@@ -687,6 +649,37 @@
           "body": "<h2>HellDash — Phase 2</h2><p class=\"isSelectedEnd\">2페이즈 전용 돌진 및 탄막 패턴의 데이터를 설정합니다.</p><div contenteditable=\"false\"><hr></div><h3>기본 이동 정보</h3><h4>시작 높이</h4><p class=\"isSelectedEnd\">패턴 시작 시 중간보스가 위로 상승하는 높이입니다.</p><h4><br></h4><h4>상승 속도</h4><p class=\"isSelectedEnd\">중간보스가 시작 높이까지 올라가는 속도입니다.</p><h4><br></h4><h4>이동 속도</h4><p class=\"isSelectedEnd\">중간보스가 돌진 시작 위치를 잡기 위해 이동하는 속도입니다.</p><h4><br></h4><h4>회전 속도</h4><p class=\"isSelectedEnd\">중간보스가 돌진 방향을 결정하거나 목표 방향으로 회전하는 속도입니다.</p><h4><br></h4><h4>돌진 횟수</h4><p class=\"isSelectedEnd\">한 번의 패턴에서 중간보스가 돌진하는 횟수입니다.</p><h4><br></h4><h4>돌진 범위</h4><p class=\"isSelectedEnd\">중간보스 돌진의 사각형 피해 판정 범위입니다.</p><h4><br></h4><h4>돌진 속도</h4><p class=\"isSelectedEnd\">중간보스가 돌진 범위를 이동하는 속도입니다.</p><div contenteditable=\"false\"><hr></div><h3>탄막 정보</h3><h4>탄막 이동 속도</h4><p class=\"isSelectedEnd\">돌진과 함께 생성되는 탄막 피해 범위가 이동하는 속도입니다.</p><h4><br></h4><h4>탄막 타격 길이</h4><p class=\"isSelectedEnd\">탄막 피해 판정 범위의 높이 또는 세로 길이입니다.</p><h4><br></h4><h4>탄막 낙하 각도</h4><p class=\"isSelectedEnd\">탄막 연출이 떨어지는 방향과 각도입니다.</p><h4><br></h4><h4>탄막 발사 간격</h4><p class=\"isSelectedEnd\">각 탄막 이펙트가 생성되는 사이의 간격입니다.</p><p class=\"isSelectedEnd\">값이 작을수록 탄막이 더 촘촘하게 생성됩니다.</p><h4><br></h4><h4>탄속</h4><p class=\"isSelectedEnd\">탄막을 구성하는 각 탄환의 이동 속도 범위입니다.</p><p class=\"isSelectedEnd\">각 탄환은 설정된 최솟값과 최댓값 사이에서 무작위 속도로 이동합니다.</p><div contenteditable=\"false\"><hr></div><h3>위치 변경 돌진 정보</h3><h4>위치 변경 대기 시간</h4><p class=\"isSelectedEnd\">중간보스가 위치 변경 돌진을 시작하기 전까지의 대기 시간입니다.</p><h4><br></h4><h4>위치 변경 돌진 속도</h4><p class=\"isSelectedEnd\">중간보스가 위치를 변경하기 위해 돌진하는 속도입니다.</p><h4><br></h4><h4>위치 변경 돌진 범위</h4><p class=\"isSelectedEnd\">위치 변경 돌진에 사용되는 사각형 범위입니다.</p><h4><br></h4><h4>위치 변경 타격 길이</h4><p class=\"isSelectedEnd\">위치 변경 돌진 중 적용되는 실제 피해 판정 범위의 높이 또는 세로 길이입니다.</p><h4><br></h4><h4>위치 변경 타격 각도</h4><p class=\"isSelectedEnd\">위치 변경 돌진 시 중간보스가 지면을 바라보는 각도입니다.</p><p class=\"isSelectedEnd\">정면을 <code dir=\"ltr\">0도</code>로 기준 삼으며, 아래 방향은 음수 각도로 적용됩니다.</p><p class=\"isSelectedEnd\">예를 들어 값을 <code dir=\"ltr\">60</code>으로 설정하면 중간보스가 정면을 기준으로 약 <code dir=\"ltr\">-60도</code> 아래를 바라봅니다.</p><h4><br></h4><h4>위치 변경 돌진 높이 그래프</h4><p class=\"isSelectedEnd\">위치 변경 돌진 중 중간보스의 높이 변화를 결정하는 그래프입니다.</p><p class=\"isSelectedEnd\">현재 해당 항목의 <code dir=\"ltr\">값</code>과 <code dir=\"ltr\">도달 시간</code>은 사용하지 않습니다.</p><p>실질적으로는 <code dir=\"ltr\">커브</code>만 사용하며, 커브의 형태에 따라 돌진 중 상승과 하강의 형태가 결정됩니다.</p>"
         }
       ]
+    },
+    "custom_1783010345602": {
+      "label": "폴더",
+      "icon": "📁",
+      "desc": "폴더 네이밍 룰",
+      "items": [
+        {
+          "id": 1783010562647,
+          "title": "폴더 네이밍 룰",
+          "author": "이세진",
+          "tags": [
+            "이름",
+            "네이밍룰",
+            "폴더"
+          ],
+          "date": "2026. 7. 3.",
+          "body": "<br>"
+        }
+      ]
+    },
+    "custom_1783010392343": {
+      "label": "빌드",
+      "icon": "🎮",
+      "desc": "빌드파일 네이밍 룰",
+      "items": []
+    },
+    "custom_1783010515344": {
+      "label": "레벨 프랍 프리팹",
+      "icon": "🧊",
+      "desc": "레벨 에디터에 사용되는 프리팹 네이밍 룰",
+      "items": []
     }
   },
   "board": {
@@ -705,12 +698,13 @@
   "tabs": {
     "groups": [
       {
-        "id": "g_pinned",
-        "icon": "📌",
-        "label": "필독",
+        "id": "g_1783010135052",
+        "icon": "🏷️",
+        "label": "네이밍 룰",
         "order": [
-          "pinned",
-          "setup"
+          "custom_1783010345602",
+          "custom_1783010392343",
+          "custom_1783010515344"
         ]
       },
       {
