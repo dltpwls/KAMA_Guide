@@ -401,7 +401,10 @@ function insertDynPage(main, key) {
   }
 }
 
+let currentAdminPage = 'tab-manage';
+
 function showAdminPage(key) {
+  currentAdminPage = key;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
   const page = document.getElementById('page-' + key);
@@ -655,6 +658,7 @@ function renderAdminSection(key) {
   const sec = data.sections[key];
   const el = document.getElementById('page-' + key);
   if (!el) return;
+  const wasActive = el.classList.contains('active');
   const items = sec.items || [];
   el.innerHTML = `
     <div class="page-header">
@@ -685,6 +689,14 @@ function renderAdminSection(key) {
           </div>`;
         }).join('')}
     </div>`;
+  // 현재 보고 있던 페이지면 active 유지
+  if (wasActive) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    const btn = document.getElementById('nav-' + key);
+    if (btn) btn.classList.add('active');
+  }
 }
 
 function moveItem(key, i, dir) {
@@ -693,6 +705,7 @@ function moveItem(key, i, dir) {
   if (ni < 0 || ni >= items.length) return;
   [items[i], items[ni]] = [items[ni], items[i]];
   renderAdminSection(key);
+  showAdminPage(key);
 }
 
 /* ── 항목 폼 ── */
@@ -786,6 +799,8 @@ function saveItem(key, idx) {
   else data.sections[key].items.push(item);
   cancelForm(key);
   renderAdminSection(key);
+  // 저장 후 반드시 현재 페이지 유지
+  showAdminPage(key);
   toast(idx >= 0 ? '수정 완료!' : '추가 완료!');
 }
 
@@ -793,6 +808,7 @@ function deleteItem(key, i) {
   if (!confirm('삭제할까요?')) return;
   data.sections[key].items.splice(i, 1);
   renderAdminSection(key);
+  showAdminPage(key);
   toast('삭제 완료');
 }
 
